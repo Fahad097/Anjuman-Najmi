@@ -1,0 +1,31 @@
+class AssetConfig {
+  static const String categoryBaseUrl = "assets/category_icon/";
+  static const String kSplashBgImage = "assets/splash_bg.png";
+  static const String kLogo = "assets/new_logo.png";
+  static const String kProfileLogo = "assets/profile.png";
+  static const String kSignInPageImage = "assets/screen_bg1.png";
+  static const String kFilterIcon = "assets/filter.png";
+  static const String kMenuIcon = "assets/menu.png";
+  static const String kMoreIcon = "assets/more.png";
+  static const String kHomeIcon = "assets/home_icon.png";
+  static const String kTabHome = "assets/home.png";
+  static const String kSettingIcon = "assets/setting.png";
+  static const String kBudgetIcon = "assets/budget.png";
+  static const String kBudgetTab = "assets/budget_tab.png";
+  static const String kReceiptIcon = "assets/receipt.png";
+  static const String kReceiptTab = "assets/receipt_edit.png";
+  static const String kReportIcon = "assets/report.png";
+  static const String ksearchIcon = "assets/search.png";
+  static const String ksearchUser = "assets/search_user.png";
+  static const String kdropdownIcon = "assets/arrow_down.png";
+  static const String kdeleteIcon = "assets/delete.png";
+  static const String kadd_Icon = "assets/add_icon.png";
+  static const String kcbudget_Icon = "assets/createbudget.png";
+  static const String krprofile_Icon = "assets/icon_profile.png";
+  static const String kmonitor_Icon = "assets/monitor.png";
+  static const String kupload_Icon = "assets/upload.png";
+  static const String knoaccess_Icon = "assets/no_access.png";
+  static const String kreadaccess_Icon = "assets/book.png";
+  static const String kreadwrite_Icon = "assets/edit_icon.png";
+  static const String kmoreHorizontleIcon = "assets/more_horizontle.png";
+}

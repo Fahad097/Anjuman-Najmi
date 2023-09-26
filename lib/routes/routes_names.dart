@@ -1,0 +1,16 @@
+const String delete = '/delete';
+const String signUp = '/signUp';
+const String signIn = '/signIn';
+const String profile = '/profile';
+const String addReceipt = '/addReceipt';
+const String viewReceipt = '/viewReceipt';
+const String assignUser = '/assingUser';
+const String rolesManagement = '/rolesManagement';
+const String budget = '/budget';
+const String editprofile = '/editprofile';
+const String splash = '/splash';
+const String budgetreport = '/budgetreport';
+const String addUser = '/adduser';
+const String botttomnav = '/botttomnav';
+const String report = '/report';
+const String roles = '/roles';
