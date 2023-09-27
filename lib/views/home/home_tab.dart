@@ -1,20 +1,46 @@
 import 'package:anjuman_e_najmi/data/model/login_response.dart';
+import 'package:anjuman_e_najmi/data/model/permission.dart';
 import 'package:anjuman_e_najmi/logic/cubit/authentication/auth_cubit.dart';
 import 'package:anjuman_e_najmi/utils/global_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../logic/cubit/receipt/receipt_cubit.dart';
 import '../../routes/routes_names.dart';
 import '../../utils/asset_config.dart';
 import '../authentication/components/asset_provider.dart';
+import '../receipt/components/viewrecceiptunpaid.dart';
 import 'home.dart';
 
-class HomeTab extends StatelessWidget {
+class HomeTab extends StatefulWidget {
   HomeTab({super.key});
 
   @override
+  State<HomeTab> createState() => _HomeTabState();
+}
+
+class _HomeTabState extends State<HomeTab> {
+  var isloading = false;
+  void _loadPaid() async {
+    await BlocProvider.of<ReceiptCubit>(context)
+        .getpaid(Globals.paid, limit: 4);
+    setState(() {
+      isloading = true;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPaid();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    LoginResponse response = LoginResponse();
+    bool hasAccess = permissionService.hasPermission('app.dashboard.receipt');
+    print("My LIST" + permissionService.userPermissions.toString());
+    print("My LIST" + hasAccess.toString());
     final authCub = BlocProvider.of<AuthCubit>(context, listen: false);
+
     return Scaffold(
       backgroundColor: Color(0xffF5F5F5),
       appBar: AppBar(
@@ -105,9 +131,8 @@ class HomeTab extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(15.0),
               child: BlocBuilder<AuthCubit, AuthState>(
-                bloc: BlocProvider.of<AuthCubit>(context).getRoleAccess(1),
                 builder: (context, state) {
-                  // BlocProvider.of<AuthCubit>(context).getRoleAccess();
+                  // BlocProvider.of<AuthCubit>(context).getRoleAccess(1);
                   // print("In home tab: ${state.accesses?[0]}");
                   debugPrint("WWWWW ${state.permission}");
                   return Column(
@@ -137,15 +162,22 @@ class HomeTab extends StatelessWidget {
                       //                     .access ==
                       //                 "r") &&
                       //         (state.accesses?[0].access != "n")
-                      (state.permission == "w" ||
-                                  response.userModel?.permissions!
-                                          .appDashboard ==
-                                      "r") &&
-                              (state.permission != "n")
-                          ? DashboardWidget(
-                              title: "Receipt",
-                            )
-                          : SizedBox(),
+                      // (state.permission == "w" ||
+                      //             response.userModel?.permissions!
+                      //                     .appDashboard ==
+                      //                 "r") &&
+                      //         (state.permission != "n")
+                      //    ?
+                      (isloading == true)
+                          ? (!hasAccess)
+                              ? SizedBox()
+                              : DashboardWidget(
+                                  title: "Receipt",
+                                )
+                          : Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                      //  : SizedBox(),
                       SizedBox(
                         height: Globals.getDeviceHeight(context) * 0.03,
                       ),
@@ -154,10 +186,11 @@ class HomeTab extends StatelessWidget {
                       //                     .access ==
                       //                 "w") &&
                       //         (state.accesses?[0].access != "n")
-                      (state.permission == "r" || state.permission == "w") &&
-                              (state.permission != "n")
-                          ? DashboardWidget(title: "Budget")
-                          : SizedBox(),
+                      // (state.permission == "r" || state.permission == "w") &&
+                      //         (state.permission != "n")
+                      // ?
+                      // DashboardWidget(title: "Budget")
+                      // : SizedBox(),
                     ],
                   );
                 },
@@ -253,123 +286,145 @@ class HomeTab extends StatelessWidget {
 
 class DashboardWidget extends StatelessWidget {
   final String title;
+
   DashboardWidget({required this.title});
 
   @override
   Widget build(BuildContext context) {
     final DateTime now = DateTime.now();
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text("$title history",
-            style: TextStyle(
-                fontFamily: 'Helvetica',
-                fontWeight: FontWeight.w400,
-                color: Color(0xff5A5A5A),
-                fontSize: 18)),
-        SizedBox(
-          height: Globals.getDeviceHeight(context) * 0.015,
-        ),
-        Row(
-          children: [
-            Text("Today",
-                style: TextStyle(
-                    fontFamily: 'Helvetica',
-                    fontWeight: FontWeight.w400,
-                    color: Color(0xff706B6B),
-                    fontSize: 14)),
-            Spacer(),
-            TextButton(
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => Home(selectedIndex: 2)));
-              },
-              child: Text("View All",
+    return BlocBuilder<ReceiptCubit, ReceiptState>(builder: (context, state) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("$title history",
+              style: TextStyle(
+                  fontFamily: 'Helvetica',
+                  fontWeight: FontWeight.w400,
+                  color: Color(0xff5A5A5A),
+                  fontSize: 18)),
+          SizedBox(
+            height: Globals.getDeviceHeight(context) * 0.015,
+          ),
+          Row(
+            children: [
+              Text("Today",
                   style: TextStyle(
                       fontFamily: 'Helvetica',
                       fontWeight: FontWeight.w400,
-                      color: Color(0xff5D74AF),
+                      color: Color(0xff706B6B),
                       fontSize: 14)),
-            )
-          ],
-        ),
-        ListView.builder(
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: 2,
-          shrinkWrap: true,
-          padding: EdgeInsets.only(top: 0),
-          itemBuilder: (ctx, i) {
-            String convertedTime =
-                "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}";
-            String convertdate =
-                "${now.day.toString().padLeft(2, '0')}-${now.month.toString().padLeft(2, '0')}-${now.year.toString()}";
+              Spacer(),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => Home(selectedIndex: 2)));
+                },
+                child: Text("View All",
+                    style: TextStyle(
+                        fontFamily: 'Helvetica',
+                        fontWeight: FontWeight.w400,
+                        color: Color(0xff5D74AF),
+                        fontSize: 14)),
+              )
+            ],
+          ),
+          ListView.builder(
+              physics: NeverScrollableScrollPhysics(),
+              padding: EdgeInsets.only(top: 0),
+              itemCount: 2,
+              shrinkWrap: true,
+              itemBuilder: (ctx, i) {
+                if (i < state.receipt!.length + 1) {
+                  return InkWell(
+                    onTap: () async {
+                      context.read<ReceiptCubit>().resetOffSet();
+                      await showDialog(
+                          context: context,
+                          builder: (BuildContext context) => ViewReceiptUnPaid(
+                                id: state.receipt?[i].id ?? 0,
+                                fullname: state.receipt?[i].fullname,
+                                amount: state.receipt?[i].hubAmount,
+                                receiptdate: state.receipt?[i].createdOn,
+                                receiptCode: state.receipt?[i].receiptCode,
+                                itsNumber: state.receipt?[i].itsNumber,
+                                hubType: state.receipt?[i].hubType,
+                                paymentMode: state.receipt?[i].paymentMode,
+                                isDeposit: state.receipt?[i].isDeposited,
+                              ));
+                    },
+                    child: Card(
+                      shadowColor: Globals.kUniversalColor,
+                      margin:
+                          const EdgeInsets.only(left: 15, right: 15, top: 15),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      child: Padding(
+                        padding: EdgeInsets.all(15),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Text(
+                                  // "#1245",
+                                  "#${state.receipt?[i].receiptCode}"
+                                      .toString(),
+                                  style: TextStyle(
+                                      fontFamily: 'Helvetica',
+                                      fontWeight: FontWeight.w400,
+                                      color: Globals.kUniversalColor,
+                                      fontSize: 15),
+                                ),
+                                Spacer(),
+                                Text(
+                                    "Date:${state.receipt?[i].depositDate.toString()
 
-            return InkWell(
-              onTap: () {
-                showDialog(
-                    context: context,
-                    builder: (BuildContext context) =>
-                        Globals.receiptpaidStatus(context));
-              },
-              child: Card(
-                shadowColor: Globals.kUniversalColor,
-                // margin: const EdgeInsets.all(10),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-                child: Padding(
-                  padding: EdgeInsets.all(15),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text(
-                            "#1245",
-                            style: TextStyle(
-                                fontFamily: 'Helvetica',
-                                fontWeight: FontWeight.w400,
-                                color: Globals.kUniversalColor,
-                                fontSize: 15),
-                          ),
-                          Spacer(),
-                          Text("Date:$convertdate",
-                              style: TextStyle(
-                                  fontFamily: 'Helvetica',
-                                  fontWeight: FontWeight.w400,
-                                  color: Color(0xff889EC9),
-                                  fontSize: 12)),
-                        ],
+                                    /// convertdate
+                                    }",
+                                    style: TextStyle(
+                                        fontFamily: 'Helvetica',
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xff889EC9),
+                                        fontSize: 12)),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Text(state.receipt?[i].fullname ?? "",
+                                      style: TextStyle(
+                                          fontFamily: 'Helvetica',
+                                          fontWeight: FontWeight.w400,
+                                          color: Color(0xff858585),
+                                          fontSize: 16)),
+                                ),
+                                Spacer(),
+                                Text(
+                                  "Time:${state.receipt?[i].createdOn.toString()}",
+                                  style: TextStyle(
+                                      fontFamily: 'Helvetica',
+                                      fontWeight: FontWeight.w400,
+                                      color: Color(0xff889EC9),
+                                      fontSize: 11),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text("Receipt Name",
-                              style: TextStyle(
-                                  fontFamily: 'Helvetica',
-                                  fontWeight: FontWeight.w400,
-                                  color: Color(0xff858585),
-                                  fontSize: 16)),
-                          Spacer(),
-                          Text(
-                            "Time:$convertedTime",
-                            style: TextStyle(
-                                fontFamily: 'Helvetica',
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xff889EC9),
-                                fontSize: 11),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
-      ],
-    );
+                    ),
+                  );
+                } else {
+                  return Center(child: Text("Please wait data is Loading...."));
+                }
+              }),
+        ],
+      );
+    });
   }
 }

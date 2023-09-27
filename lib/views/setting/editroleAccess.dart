@@ -1,3 +1,5 @@
+import 'package:anjuman_e_najmi/data/model/permission.dart';
+import 'package:anjuman_e_najmi/logic/cubit/authentication/auth_cubit.dart';
 import 'package:anjuman_e_najmi/logic/cubit/role/role_state.dart';
 import 'package:anjuman_e_najmi/utils/asset_config.dart';
 import 'package:anjuman_e_najmi/utils/landscape_mode.dart';
@@ -35,11 +37,6 @@ class _EditRoleAccessState extends State<EditRoleAccess> {
             .rolepermissionList?[index]
             .code ??
         "";
-    print('My Work' +
-        BlocProvider.of<RoleCubit>(context)
-            .state
-            .selectedDropdownValues
-            .toString());
     BlocProvider.of<RoleCubit>(context).editTempRole(code, '',
         BlocProvider.of<RoleCubit>(context).state.selectedDropdownValues);
     BlocProvider.of<RoleCubit>(context).editrole(widget.name ?? "");
@@ -288,14 +285,14 @@ class _EditRoleAccessState extends State<EditRoleAccess> {
                           }
                           return null;
                         }),
-                        Divider(
-                          color: Color(0xff6788DF),
-                          thickness: 1,
-                          indent: 60,
-                          endIndent: 60,
-                        ),
+                        // Divider(
+                        //   color: Color(0xff6788DF),
+                        //   thickness: 1,
+                        //   indent: 60,
+                        //   endIndent: 60,
+                        // ),
                         SizedBox(
-                          height: Globals.getDeviceHeight(context) * 0.02,
+                          height: Globals.getDeviceHeight(context) * 0.01,
                         ),
                         Container(
                           padding: EdgeInsets.all(15),
@@ -353,15 +350,14 @@ class _EditRoleAccessState extends State<EditRoleAccess> {
                                                           .code ??
                                                       "";
                                                   print("Fahad" + code);
-
-                                                  BlocProvider.of<RoleCubit>(
+                                                  var roles = state
+                                                      .selectedDropdownValues;
+                                                   BlocProvider.of<RoleCubit>(
                                                           context)
                                                       .editTempRole(
                                                           code,
                                                           newValue.toString(),
-                                                          state
-                                                              .selectedDropdownValues);
-
+                                                          roles);
                                                   BlocProvider.of<RoleCubit>(
                                                           context)
                                                       .updateDropdown(

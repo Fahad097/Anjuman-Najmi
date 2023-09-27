@@ -17,7 +17,7 @@ class AuthState {
   final bool? activeConnection;
   GlobalKey<FormState>? loginkey;
   final imagefile;
-  final String? permission;
+  final Map<String,dynamic>? permission;
   final String? fullname;
   final String? error;
   List<AccessModel>? accesses;
@@ -67,7 +67,7 @@ class AuthState {
     final int? iisPending,
     final String? phoneNu,
     final String? ttoken,
-    final String? ppermission,
+    final Map<String,dynamic>? ppermission,
     final List<UserModel>? uuserList,
     bool? iisloading,
     final String? eemail,

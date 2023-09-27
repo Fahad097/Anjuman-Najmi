@@ -4,6 +4,7 @@ import 'package:anjuman_e_najmi/utils/landscape_mode.dart';
 import 'package:anjuman_e_najmi/views/setting/page_access_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../data/model/adduser_role.dart';
 import '../../logic/cubit/role/role_cubit.dart';
 import '../../routes/routes_names.dart';
 import '../../utils/global_constants.dart';
@@ -391,6 +392,7 @@ class _RolesManagementState extends State<RolesManagement> {
                                         .read<RoleCubit>()
                                         .addUserRole(context);
                                   }
+                                  
                                 }
                               : null,
                           child: (isloading == false)

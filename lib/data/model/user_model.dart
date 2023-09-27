@@ -12,7 +12,7 @@ class UserModel {
   int? isDeleted;
   String? roleName;
   String? success;
-  Permissions? permissions;
+  Map<String,dynamic>? permissions;
   String? token;
 
   UserModel(
@@ -43,7 +43,7 @@ class UserModel {
     createdAt = json['created_at'];
     success = json['success'];
     permissions = json['permissions'] != null
-        ? new Permissions.fromJson(json['permissions'])
+        ? json['permissions']!
         : null;
     token = json['token'];
   }
@@ -61,7 +61,7 @@ class UserModel {
     json['role_name'] = this.roleName;
     json['created_at'] = this.createdAt;
     if (this.permissions != null) {
-      json['permissions'] = this.permissions!.toJson();
+      json['permissions'] = this.permissions;
     }
     json['token'] = this.token;
     return json;

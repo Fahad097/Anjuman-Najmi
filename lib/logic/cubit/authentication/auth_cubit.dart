@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+import 'package:anjuman_e_najmi/data/model/permission.dart';
 import 'package:anjuman_e_najmi/data/model/user_model.dart';
 import 'package:anjuman_e_najmi/routes/routes_names.dart';
 import 'package:flutter/material.dart';
@@ -89,6 +90,8 @@ class AuthCubit extends Cubit<AuthState> {
     emit(state.copywith(uupdateisPending: m));
   }
 
+  
+
   saveDataInShared() async {
     debugPrint("ttttt ${state.token} $userId");
     SharedPreferences pre = await SharedPreferences.getInstance();
@@ -161,7 +164,10 @@ class AuthCubit extends Cubit<AuthState> {
               uusername: response.userModel?.username,
               ppassword: response.userModel?.password,
               ttoken: response.userModel?.token,
+              ppermission: response.userModel?.permissions,
               iisloading: false));
+          permissionService
+              .updateUserPermissions(response.userModel?.permissions);
           debugPrint(
               "debug ${response.userModel!.id.toString()} ${state.token.toString()}");
           // Future.delayed(const Duration(seconds: 1), () => saveDataInShared());

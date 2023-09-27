@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:anjuman_e_najmi/data/model/adduser_role.dart';
 import 'package:anjuman_e_najmi/data/model/userrole_model.dart';
+import 'package:anjuman_e_najmi/logic/cubit/authentication/auth_cubit.dart';
 import 'package:anjuman_e_najmi/logic/cubit/role/role_state.dart';
 import 'package:anjuman_e_najmi/utils/global_constants.dart';
 import 'package:flutter/cupertino.dart';
@@ -164,10 +165,10 @@ class RoleCubit extends Cubit<RoleState> {
       "name": state.editroleName,
       "permission": state.permission
     };
-
+    var response;
     await roleRepository.editUserRole(variable, id).then((value) {
       log("EditUserRole: ${state.editroleName} ");
-      final response = AddUserRoleModel.fromJson(value);
+      response = AddUserRoleModel.fromJson(value);
       log("Result editUserRole: $response ");
       if (response.statusCode != null &&
           response.statusCode == 200 &&
@@ -177,13 +178,15 @@ class RoleCubit extends Cubit<RoleState> {
             ppermission: state.permission,
             ppermissionlist: response.data?.permissions));
       }
-    });
+    }).onError((error, stackTrace) =>
+        Globals.showToast("There is issue please add again!"));
     await getUserRole(context);
     Globals.showToast("UserRole is Edit");
     Navigator.pop(context);
   }
 
-  void editTempRole(String code, String access, List<String>? mylist) {
+ 
+void editTempRole(String code, String access, List<String>? mylist) {
     // Create a copy of the existing permissions map
     int i = 0;
     final Map<String, String> updatedPermissions =
@@ -203,9 +206,7 @@ class RoleCubit extends Cubit<RoleState> {
 
     // Update the state with the modified permissions map
     emit(state.copyWith(ppermission: updatedPermissions));
-
     // Debug print the updated permissions
-    debugPrint("Edit On cHnagev " + updatedPermissions.toString());
   }
 
   void addTempRole(String code, String access) {
@@ -247,7 +248,8 @@ class RoleCubit extends Cubit<RoleState> {
             ppermission: state.permission,
             ppermissionlist: response.data?.permissions));
       }
-    });
+    }).onError((error, stackTrace) =>
+        Globals.showToast("There is issue please add again!"));
     await getUserRole(context);
     Globals.showToast("Role is Added");
     Navigator.pop(context);

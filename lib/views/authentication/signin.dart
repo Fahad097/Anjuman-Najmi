@@ -18,12 +18,6 @@ class SignIn extends StatelessWidget {
         backgroundColor: Color(0xffF5F5F5),
         body: BlocBuilder<AuthCubit, AuthState>(
           builder: (context, state) {
-            // if (state.timer == null || state.timer!.isActive) {
-            //   print("SDS");
-            //   state.timer?.cancel();
-            //   // state.timer = Timer(Duration(seconds: 5), () {});
-            // }
-            //   BlocProvider.of<AuthCubit>(context).stopTimer();
             return SingleChildScrollView(
               child: Column(
                 children: [
@@ -129,6 +123,7 @@ class SignIn extends StatelessWidget {
                                       autovalidateMode:
                                           AutovalidateMode.onUserInteraction,
                                       keyboardType: TextInputType.number,
+                                      obscureText: true,
                                       validator: (value) {
                                         if (value == null ||
                                             value.trim().isEmpty) {
@@ -149,11 +144,13 @@ class SignIn extends StatelessWidget {
                                           : print("$value"),
                                       decoration: InputDecoration(
                                         // focusColor: const Color(0xffE4F9E8),
+
                                         border: OutlineInputBorder(
                                             borderRadius:
                                                 BorderRadius.circular(10)),
                                         // filled: true,
                                         hintText: "Password",
+
                                         hintStyle: TextStyle(
                                           fontFamily: 'Helvetica',
                                           color: Globals.kFiledColor,

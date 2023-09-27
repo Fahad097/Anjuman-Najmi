@@ -47,7 +47,7 @@ class MyApp extends StatelessWidget {
             primarySwatch: Colors.blue,
           ),
           onGenerateRoute: CustomRoutes.allRoutes,
-          initialRoute: botttomnav),
+          initialRoute: splash),
     );
   }
 }

@@ -53,6 +53,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   }
 
   Widget build(BuildContext context) {
+    
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 15, 5, 5),
       body: TabBarView(controller: _tabController2, children: [

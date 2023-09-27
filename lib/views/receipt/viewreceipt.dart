@@ -1,3 +1,4 @@
+import 'package:anjuman_e_najmi/data/model/permission.dart';
 import 'package:anjuman_e_najmi/routes/routes_names.dart';
 import 'package:anjuman_e_najmi/utils/asset_config.dart';
 import 'package:anjuman_e_najmi/views/receipt/paid.dart';
@@ -32,6 +33,9 @@ class _ViewReceiptState extends State<ViewReceipt>
       cubit.getpaid(Globals.paid, limit: 4);
     }
   }
+
+  bool hasAccess = permissionService.hasPermission('app.receipt');
+  bool hasWrite = permissionService.hasWritePermission('app.receipt');
 
   @override
   Widget build(BuildContext context) {
@@ -225,22 +229,27 @@ class _ViewReceiptState extends State<ViewReceipt>
           floatingActionButton:
               // state.accesses?[1].access == "w"
               //     ?
-              FloatingActionButton(
-                  child: ImageIcon(AssetImage(AssetConfig.kReceiptIcon)),
-                  backgroundColor: Globals.kUniversalColor,
-                  onPressed: () {
-                    context.read<ReceiptCubit>().lastReceiptNumber();
-                    context.read<ReceiptCubit>().getPayment();
-                    context.read<ReceiptCubit>().getHubType();
-                    Navigator.pushNamed(context, addReceipt);
-                    // Navigator.push(context,
-                    //     MaterialPageRoute(builder: (_) => Pagination()));
-                  }),
-          // : SizedBox(),
-          body: TabBarView(
-            controller: _tabController,
-            children: [Pending(), Paid()],
-          ),
+              (hasAccess && !hasWrite)
+                  ? FloatingActionButton(
+                      child: ImageIcon(AssetImage(AssetConfig.kReceiptIcon)),
+                      backgroundColor: Globals.kUniversalColor,
+                      onPressed: () {
+                        context.read<ReceiptCubit>().lastReceiptNumber();
+                        context.read<ReceiptCubit>().getPayment();
+                        context.read<ReceiptCubit>().getHubType();
+                        Navigator.pushNamed(context, addReceipt);
+                        // Navigator.push(context,
+                        //     MaterialPageRoute(builder: (_) => Pagination()));
+                      })
+                  : SizedBox(),
+          body: (hasAccess)
+              ? TabBarView(
+                  controller: _tabController,
+                  children: [Pending(), Paid()],
+                )
+              : SizedBox(
+                  child: Center(child: Text("You don't have Access")),
+                ),
         );
       },
     );
