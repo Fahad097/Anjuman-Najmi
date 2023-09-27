@@ -1,3 +1,4 @@
+import 'package:anjuman_e_najmi/data/model/permission.dart';
 import 'package:anjuman_e_najmi/routes/routes_names.dart';
 import 'package:anjuman_e_najmi/utils/asset_config.dart';
 import 'package:anjuman_e_najmi/views/userManagement/adduser.dart';
@@ -23,12 +24,14 @@ class _UserRoleState extends State<UserRole> {
   int index = 0;
   var ichceeckd = true;
   AuthCubit? authCub;
+
   @override
   void initState() {
     authCub = BlocProvider.of<AuthCubit>(context, listen: false);
     super.initState();
   }
 
+  bool hasWriteUser = permissionService.hasWritePermission('app.user');
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,27 +60,28 @@ class _UserRoleState extends State<UserRole> {
                     ),
                     itemBuilder: (context) {
                       return [
-                        PopupMenuItem<int>(
-                            value: 1,
-                            child: Row(
-                              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                AssetProvider(
-                                    asset: "assets/user_icon.png",
-                                    width: 20,
-                                    height: 20,
-                                    color: Color(0xff717171)),
-                                SizedBox(
-                                  width: 3,
-                                ),
-                                Text("AddUser",
-                                    style: TextStyle(
-                                      fontFamily: 'Helvetica',
-                                      color: Globals.kUniversalColor,
-                                      fontWeight: FontWeight.w400,
-                                    )),
-                              ],
-                            )),
+                        if (hasWriteUser)
+                          PopupMenuItem<int>(
+                              value: 1,
+                              child: Row(
+                                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  AssetProvider(
+                                      asset: "assets/user_icon.png",
+                                      width: 20,
+                                      height: 20,
+                                      color: Color(0xff717171)),
+                                  SizedBox(
+                                    width: 3,
+                                  ),
+                                  Text("AddUser",
+                                      style: TextStyle(
+                                        fontFamily: 'Helvetica',
+                                        color: Globals.kUniversalColor,
+                                        fontWeight: FontWeight.w400,
+                                      )),
+                                ],
+                              )),
                         PopupMenuItem<int>(
                             value: 2,
                             child: Row(
@@ -377,32 +381,33 @@ class _UserRoleState extends State<UserRole> {
                                   //     print(state.userList?[index].isPending);
                                   //   },
                                   // )
-
-                                  Switch(
-                                    onChanged: (value) {
-                                      bool isPending = !value;
-                                      BlocProvider.of<AuthCubit>(context)
-                                          .isPending(isPending ? 0 : 1);
-                                      BlocProvider.of<AuthCubit>(context)
-                                          .updateIsPending(isPending ? 0 : 1);
-                                      BlocProvider.of<AuthCubit>(context)
-                                          .userFlag(
-                                              state.userList?[index].id ?? 0,
-                                              isPending ? 0 : 1);
-                                      print(BlocProvider.of<AuthCubit>(context)
-                                          .state
-                                          .updateisPending);
-                                    },
-                                    value:
-                                        state.userList?[index].isPending == 0,
-                                    activeColor:
-                                        state.userList?[index].isPending == 0
-                                            ? Colors.blue
-                                            : Colors.white,
-                                    activeTrackColor: Color(0xffC1C1C1),
-                                    inactiveThumbColor: Colors.white,
-                                    inactiveTrackColor: Color(0xffC1C1C1),
-                                  )
+                                  if (hasWriteUser)
+                                    Switch(
+                                      onChanged: (value) {
+                                        bool isPending = !value;
+                                        BlocProvider.of<AuthCubit>(context)
+                                            .isPending(isPending ? 0 : 1);
+                                        BlocProvider.of<AuthCubit>(context)
+                                            .updateIsPending(isPending ? 0 : 1);
+                                        BlocProvider.of<AuthCubit>(context)
+                                            .userFlag(
+                                                state.userList?[index].id ?? 0,
+                                                isPending ? 0 : 1);
+                                        print(
+                                            BlocProvider.of<AuthCubit>(context)
+                                                .state
+                                                .updateisPending);
+                                      },
+                                      value:
+                                          state.userList?[index].isPending == 0,
+                                      activeColor:
+                                          state.userList?[index].isPending == 0
+                                              ? Colors.blue
+                                              : Colors.white,
+                                      activeTrackColor: Color(0xffC1C1C1),
+                                      inactiveThumbColor: Colors.white,
+                                      inactiveTrackColor: Color(0xffC1C1C1),
+                                    )
                                 ],
                               ),
                             ),
@@ -663,9 +668,12 @@ class _StyledSwitchState extends State<StyledSwitch> {
 
   @override
   void initState() {
-    isToggled = BlocProvider.of<AuthCubit>(context).state.updateisPending == 0
-        ? false
-        : true;
+    setState(() {
+      isToggled = BlocProvider.of<AuthCubit>(context).state.updateisPending == 0
+          ? false
+          : true;
+    });
+
     innerPadding = size / 10;
     super.initState();
   }

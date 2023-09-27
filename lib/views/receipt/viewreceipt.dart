@@ -67,26 +67,27 @@ class _ViewReceiptState extends State<ViewReceipt>
                       ),
                       itemBuilder: (context) {
                         return [
-                          PopupMenuItem<int>(
-                              value: 0,
-                              child: Row(
-                                children: [
-                                  AssetProvider(
-                                      asset: AssetConfig.kReceiptIcon,
-                                      width: 20,
-                                      height: 20,
-                                      color: Color(0xff717171)),
-                                  SizedBox(
-                                    width: 3,
-                                  ),
-                                  Text("Add Receipt",
-                                      style: TextStyle(
-                                        fontFamily: 'Helvetica',
-                                        color: Globals.kUniversalColor,
-                                        fontWeight: FontWeight.w400,
-                                      )),
-                                ],
-                              )),
+                          if (hasAccess && hasWrite)
+                            PopupMenuItem<int>(
+                                value: 0,
+                                child: Row(
+                                  children: [
+                                    AssetProvider(
+                                        asset: AssetConfig.kReceiptIcon,
+                                        width: 20,
+                                        height: 20,
+                                        color: Color(0xff717171)),
+                                    SizedBox(
+                                      width: 3,
+                                    ),
+                                    Text("Add Receipt",
+                                        style: TextStyle(
+                                          fontFamily: 'Helvetica',
+                                          color: Globals.kUniversalColor,
+                                          fontWeight: FontWeight.w400,
+                                        )),
+                                  ],
+                                )),
                           PopupMenuItem<int>(
                               value: 1,
                               child: Row(
@@ -229,7 +230,7 @@ class _ViewReceiptState extends State<ViewReceipt>
           floatingActionButton:
               // state.accesses?[1].access == "w"
               //     ?
-              (hasAccess && !hasWrite)
+              (hasAccess && hasWrite)
                   ? FloatingActionButton(
                       child: ImageIcon(AssetImage(AssetConfig.kReceiptIcon)),
                       backgroundColor: Globals.kUniversalColor,

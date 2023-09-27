@@ -19,6 +19,7 @@ class ViewReceiptUnPaid extends StatefulWidget {
     this.hubType,
     this.itsNumber,
     this.paymentMode,
+    this.isDeshboard,
   });
   final int? id;
   final String? fullname;
@@ -34,6 +35,7 @@ class ViewReceiptUnPaid extends StatefulWidget {
   final int? paymentMode;
 
   final int? itsNumber;
+  final bool? isDeshboard;
 
   @override
   State<ViewReceiptUnPaid> createState() => _ViewReceiptUnPaidState();
@@ -47,7 +49,10 @@ class _ViewReceiptUnPaidState extends State<ViewReceiptUnPaid> {
   }
 
   int i = 0;
-  var hasWrite = permissionService.hasWritePermission('app.dashboard.receipt');
+  var hasWriteDashboard =
+      permissionService.hasWritePermission('app.dashboard.receipt');
+  var hasWrite = permissionService.hasWritePermission('app.receipt');
+  var hasWritePaid = permissionService.hasWritePermission('app.receipt.paid');
   Widget build(BuildContext context) {
     final authCub = BlocProvider.of<AuthCubit>(context, listen: false);
     return BlocBuilder<ReceiptCubit, ReceiptState>(
@@ -73,27 +78,50 @@ class _ViewReceiptUnPaidState extends State<ViewReceiptUnPaid> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     //1245
-                    if (!hasWrite)
-                      IconButton(
-                          onPressed: () {
-                            //  context.read<ReceiptCubit>().lastReceiptNumber();
-                            context.read<ReceiptCubit>().getPayment();
-                            context.read<ReceiptCubit>().getHubType();
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => EditReceipt(
-                                          receitId: widget.id,
-                                          fullname: widget.fullname,
-                                          amount: widget.amount,
-                                          receiptdate: widget.receiptdate,
-                                          receiptCode: widget.receiptCode,
-                                          hubType: widget.hubType,
-                                          paymentMode: widget.paymentMode,
-                                          itsNumber: widget.itsNumber,
-                                        )));
-                          },
-                          icon: Icon(Icons.edit)),
+                    if (widget.isDeshboard == true)
+                      if (hasWriteDashboard)
+                        IconButton(
+                            onPressed: () {
+                              //  context.read<ReceiptCubit>().lastReceiptNumber();
+                              context.read<ReceiptCubit>().getPayment();
+                              context.read<ReceiptCubit>().getHubType();
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => EditReceipt(
+                                            receitId: widget.id,
+                                            fullname: widget.fullname,
+                                            amount: widget.amount,
+                                            receiptdate: widget.receiptdate,
+                                            receiptCode: widget.receiptCode,
+                                            hubType: widget.hubType,
+                                            paymentMode: widget.paymentMode,
+                                            itsNumber: widget.itsNumber,
+                                          )));
+                            },
+                            icon: Icon(Icons.edit)),
+                    if (widget.isDeshboard == false)
+                      if (hasWrite)
+                        IconButton(
+                            onPressed: () {
+                              //  context.read<ReceiptCubit>().lastReceiptNumber();
+                              context.read<ReceiptCubit>().getPayment();
+                              context.read<ReceiptCubit>().getHubType();
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => EditReceipt(
+                                            receitId: widget.id,
+                                            fullname: widget.fullname,
+                                            amount: widget.amount,
+                                            receiptdate: widget.receiptdate,
+                                            receiptCode: widget.receiptCode,
+                                            hubType: widget.hubType,
+                                            paymentMode: widget.paymentMode,
+                                            itsNumber: widget.itsNumber,
+                                          )));
+                            },
+                            icon: Icon(Icons.edit)),
                     Text("Receipt#${widget.receiptCode}",
                         style: TextStyle(
                           fontFamily: 'Helvetica',
@@ -207,21 +235,38 @@ class _ViewReceiptUnPaidState extends State<ViewReceiptUnPaid> {
                                   ),
                                 )
                               : SizedBox(),
-                          if (!hasWrite)
-                            IconButton(
-                                onPressed: () {
-                                  BlocProvider.of<ReceiptCubit>(context)
-                                      .deleteReceipt(widget.id ?? 0);
-                                  // BlocProvider.of<ReceiptCubit>(context)
-                                  //     .getReceipt(widget.id ?? 0);
+                          if (widget.isDeshboard == true)
+                            if (hasWriteDashboard)
+                              IconButton(
+                                  onPressed: () {
+                                    BlocProvider.of<ReceiptCubit>(context)
+                                        .deleteReceipt(widget.id ?? 0);
+                                    // BlocProvider.of<ReceiptCubit>(context)
+                                    //     .getReceipt(widget.id ?? 0);
 
-                                  Navigator.pop(context);
-                                },
-                                icon: Icon(
-                                  Icons.delete,
-                                  size: 30,
-                                  color: Color(0xff456BD0),
-                                )),
+                                    Navigator.pop(context);
+                                  },
+                                  icon: Icon(
+                                    Icons.delete,
+                                    size: 30,
+                                    color: Color(0xff456BD0),
+                                  )),
+                          if (widget.isDeshboard == false)
+                            if (hasWrite)
+                              IconButton(
+                                  onPressed: () {
+                                    BlocProvider.of<ReceiptCubit>(context)
+                                        .deleteReceipt(widget.id ?? 0);
+                                    // BlocProvider.of<ReceiptCubit>(context)
+                                    //     .getReceipt(widget.id ?? 0);
+
+                                    Navigator.pop(context);
+                                  },
+                                  icon: Icon(
+                                    Icons.delete,
+                                    size: 30,
+                                    color: Color(0xff456BD0),
+                                  )),
                         ]);
                   },
                 ),

@@ -1,3 +1,4 @@
+import 'package:anjuman_e_najmi/data/model/permission.dart';
 import 'package:anjuman_e_najmi/logic/cubit/role/role_cubit.dart';
 import 'package:anjuman_e_najmi/logic/cubit/role/role_state.dart';
 import 'package:anjuman_e_najmi/views/setting/components/collapse_button.dart';
@@ -32,6 +33,9 @@ class _RolesState extends State<Roles> {
     _getUser();
   }
 
+  bool hasWriteRole = permissionService.hasWritePermission('app.user_role');
+  bool hasWriteRead = permissionService.hasReadPermission('app.user_role');
+  bool hasWriteUser = permissionService.hasWritePermission('app.user');
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,53 +48,54 @@ class _RolesState extends State<Roles> {
                   : Globals.getDeviceHeight(context) * 0.21),
           child: AppBar(
             actions: [
-              PopupMenuButton(
-                  padding: EdgeInsets.all(5),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(20.0),
-                      bottomRight: Radius.circular(20.0),
-                      topLeft: Radius.circular(20.0),
-                      topRight: Radius.circular(0),
+              if (hasWriteUser)
+                PopupMenuButton(
+                    padding: EdgeInsets.all(5),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(20.0),
+                        bottomRight: Radius.circular(20.0),
+                        topLeft: Radius.circular(20.0),
+                        topRight: Radius.circular(0),
+                      ),
                     ),
-                  ),
-                  icon: ImageIcon(
-                    AssetImage(AssetConfig.kMoreIcon),
-                    color: Colors.white,
-                  ),
-                  itemBuilder: (context) {
-                    return [
-                      PopupMenuItem<int>(
-                          value: 1,
-                          child: Row(
-                            children: [
-                              AssetProvider(
-                                  asset: "assets/user_icon.png",
-                                  width: 20,
-                                  height: 20,
-                                  color: Color(0xff717171)),
-                              SizedBox(
-                                width: 3,
-                              ),
-                              Text("AddUser",
-                                  style: TextStyle(
-                                    fontFamily: 'Helvetica',
-                                    color: Globals.kUniversalColor,
-                                    fontWeight: FontWeight.w400,
-                                  )),
-                            ],
-                          )),
-                    ];
-                  },
-                  onSelected: (value) {
-                    if (value == 0) {
-                      Navigator.pushNamed(context, rolesManagement);
-                    } else if (value == 1) {
-                      Navigator.pushNamed(context, addUser);
-                    } else if (value == 2) {
-                      print("Logout menu is selected.");
-                    }
-                  })
+                    icon: ImageIcon(
+                      AssetImage(AssetConfig.kMoreIcon),
+                      color: Colors.white,
+                    ),
+                    itemBuilder: (context) {
+                      return [
+                        PopupMenuItem<int>(
+                            value: 1,
+                            child: Row(
+                              children: [
+                                AssetProvider(
+                                    asset: "assets/user_icon.png",
+                                    width: 20,
+                                    height: 20,
+                                    color: Color(0xff717171)),
+                                SizedBox(
+                                  width: 3,
+                                ),
+                                Text("AddUser",
+                                    style: TextStyle(
+                                      fontFamily: 'Helvetica',
+                                      color: Globals.kUniversalColor,
+                                      fontWeight: FontWeight.w400,
+                                    )),
+                              ],
+                            )),
+                      ];
+                    },
+                    onSelected: (value) {
+                      if (value == 0) {
+                        Navigator.pushNamed(context, rolesManagement);
+                      } else if (value == 1) {
+                        Navigator.pushNamed(context, addUser);
+                      } else if (value == 2) {
+                        print("Logout menu is selected.");
+                      }
+                    })
             ],
             leading: IconButton(
               onPressed: () {
@@ -168,126 +173,174 @@ class _RolesState extends State<Roles> {
           return SingleChildScrollView(
               child: Padding(
             padding: const EdgeInsets.only(top: 50),
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: <
-                    Widget>[
-              Padding(
-                padding: const EdgeInsets.only(left: 30, right: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Roles",
-                      style: TextStyle(
-                          fontFamily: 'Helvetica',
-                          fontSize: 30,
-                          fontWeight: FontWeight.w400,
-                          color: Color.fromRGBO(69, 107, 208, 1)),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(left: 30, right: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Roles",
+                          style: TextStyle(
+                              fontFamily: 'Helvetica',
+                              fontSize: 30,
+                              fontWeight: FontWeight.w400,
+                              color: Color.fromRGBO(69, 107, 208, 1)),
+                        ),
+                        if (hasWriteRole)
+                          FloatingActionButton(
+                              child: ImageIcon(
+                                  AssetImage(AssetConfig.kReceiptIcon)),
+                              backgroundColor: Globals.kUniversalColor,
+                              onPressed: () {
+                                BlocProvider.of<RoleCubit>(context)
+                                    .permission("Add Role");
+                                state.permission?.clear();
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) => RolesManagement(
+                                              add: "Add Role",
+                                            )));
+                              }),
+                      ],
                     ),
-                    FloatingActionButton(
-                        child: ImageIcon(AssetImage(AssetConfig.kReceiptIcon)),
-                        backgroundColor: Globals.kUniversalColor,
-                        onPressed: () {
-                          BlocProvider.of<RoleCubit>(context)
-                              .permission("Add Role");
-                          state.permission?.clear();
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => RolesManagement(
-                                        add: "Add Role",
-                                      )));
-                        }),
-                  ],
-                ),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              (isloading == false)
-                  ? Center(
-                      child: CircularProgressIndicator(),
-                    )
-                  : ListView.separated(
-                      separatorBuilder: (context, index) => Divider(
-                            color: Colors.transparent,
-                            height: 10,
-                          ),
-                      itemCount: state.userRole?.length ?? 0,
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      padding: EdgeInsets.only(top: 20, bottom: 20),
-                      itemBuilder: (context, index) => Column(
-                            children: [
-                              Container(
-                                alignment: Alignment.center,
-                                width: Globals.getDeviceWidth(context) * 0.90,
-                                height: Globals.getDeviceHeight(context) * 0.08,
-                                decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(29)),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      // const SizedBox(
-                                      // width: 30,
-                                      // ),
-                                      Text(
-                                        //    state.roles?[index].name ??
-                                        //     "NULL",
-                                        state.userRole![index].name ?? "",
-                                        style: TextStyle(
-                                            fontFamily: 'Helvetica',
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w400),
-                                      ),
-
-                                      CollapseButton(
-                                        onTapDEL: () async {
-                                          await context
-                                              .read<RoleCubit>()
-                                              .deleteUserRole(context,
-                                                  state.userRole![index].id!);
-                                          await context
-                                              .read<RoleCubit>()
-                                              .getUserRole(context);
-                                        },
-                                        onEditTap: () {
-                                          state.permission!.clear();
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (_) =>
-                                                      EditRoleAccess(
-                                                        add: "Update",
-                                                        id: state
-                                                            .userRole?[index]
-                                                            .id,
-                                                        name: state
-                                                            .userRole?[index]
-                                                            .name,
-                                                      )));
-
-                                          debugPrint(state.userRole?[index].id
-                                              .toString());
-                                        },
-                                      )
-                                    ],
-                                  ),
-                                ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  (isloading == false)
+                      ? Center(
+                          child: CircularProgressIndicator(),
+                        )
+                      : ListView.separated(
+                          separatorBuilder: (context, index) => Divider(
+                                color: Colors.transparent,
+                                height: 10,
                               ),
-                              index == (state.roles?.length ?? 0) - 1
-                                  ? const SizedBox(
-                                      height: 20,
-                                    )
-                                  : const SizedBox()
-                            ],
-                          )),
-            ]),
+                          itemCount: state.userRole?.length ?? 0,
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          padding: EdgeInsets.only(top: 20, bottom: 20),
+                          itemBuilder: (context, index) => Column(
+                                children: [
+                                  Container(
+                                    alignment: Alignment.center,
+                                    width:
+                                        Globals.getDeviceWidth(context) * 0.90,
+                                    height:
+                                        Globals.getDeviceHeight(context) * 0.08,
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius:
+                                            BorderRadius.circular(29)),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          // const SizedBox(
+                                          // width: 30,
+                                          // ),
+                                          Text(
+                                            //    state.roles?[index].name ??
+                                            //     "NULL",
+                                            state.userRole![index].name ?? "",
+                                            style: TextStyle(
+                                                fontFamily: 'Helvetica',
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w400),
+                                          ),
+                                          if (hasWriteRole)
+                                            CollapseButton(
+                                              onTapDEL: () async {
+                                                await context
+                                                    .read<RoleCubit>()
+                                                    .deleteUserRole(
+                                                        context,
+                                                        state.userRole![index]
+                                                            .id!);
+                                                await context
+                                                    .read<RoleCubit>()
+                                                    .getUserRole(context);
+                                              },
+                                              onEditTap: () {
+                                                state.permission!.clear();
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (_) =>
+                                                            EditRoleAccess(
+                                                              add: "Update",
+                                                              id: state
+                                                                  .userRole?[
+                                                                      index]
+                                                                  .id,
+                                                              name: state
+                                                                  .userRole?[
+                                                                      index]
+                                                                  .name,
+                                                            )));
+
+                                                debugPrint(state
+                                                    .userRole?[index].id
+                                                    .toString());
+                                              },
+                                            ),
+                                          if (hasWriteRead)
+                                            InkWell(
+                                              onTap: () {
+                                                state.permission!.clear();
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (_) =>
+                                                            EditRoleAccess(
+                                                              add: "Update",
+                                                              id: state
+                                                                  .userRole?[
+                                                                      index]
+                                                                  .id,
+                                                              name: state
+                                                                  .userRole?[
+                                                                      index]
+                                                                  .name,
+                                                            )));
+
+                                                debugPrint(state
+                                                    .userRole?[index].id
+                                                    .toString());
+                                              },
+                                              child: CustomPaint(
+                                                  size: Size(26,
+                                                      26), // Set the size of the canvas
+                                                  painter: CirclePainter(),
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            2.0),
+                                                    child: Icon(
+                                                      Icons.arrow_back_rounded,
+                                                      color: Colors.white,
+                                                    ),
+                                                  )),
+                                            ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  index == (state.roles?.length ?? 0) - 1
+                                      ? const SizedBox(
+                                          height: 20,
+                                        )
+                                      : const SizedBox()
+                                ],
+                              )),
+                ]),
           ));
         },
       ),

@@ -93,7 +93,8 @@ class _PendingState extends State<Pending> {
                                     itsNumber: state.receipt?[i].itsNumber,
                                     hubType: state.receipt?[i].hubType,
                                     paymentMode: state.receipt?[i].paymentMode,
-                                    isDeposit: state.receipt?[i].isDeposited));
+                                    isDeposit: state.receipt?[i].isDeposited,
+                                    isDeshboard: false));
                       },
                       child: Card(
                         shadowColor: Globals.kUniversalColor,

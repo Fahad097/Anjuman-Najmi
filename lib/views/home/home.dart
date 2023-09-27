@@ -1,3 +1,4 @@
+import 'package:anjuman_e_najmi/data/model/permission.dart';
 import 'package:anjuman_e_najmi/logic/cubit/authentication/auth_cubit.dart';
 import 'package:anjuman_e_najmi/views/budget/budget.dart';
 import 'package:anjuman_e_najmi/views/setting/roles.dart';
@@ -52,8 +53,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     super.dispose();
   }
 
+  bool hasAccessUser = permissionService.hasPermission('app.user');
+  bool hasAccessRole = permissionService.hasPermission('app.user_role');
   Widget build(BuildContext context) {
-    
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 15, 5, 5),
       body: TabBarView(controller: _tabController2, children: [
@@ -113,35 +115,36 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                         } else {
                           Navigator.push(context,
                               MaterialPageRoute(builder: (_) => Roles()));
-                      
-                         }
+                        }
                       },
                       itemBuilder: (BuildContext context) =>
                           <PopupMenuEntry<String>>[
-                        PopupMenuItem<String>(
-                          onTap: () {},
-                          value: 'User Management',
-                          child: Text(
-                            'User Management',
-                            style: TextStyle(
-                              fontFamily: 'Helvetica',
-                              color: Globals.kUniversalColor,
-                              fontWeight: FontWeight.w400,
+                        if (hasAccessUser)
+                          PopupMenuItem<String>(
+                            onTap: () {},
+                            value: 'User Management',
+                            child: Text(
+                              'User Management',
+                              style: TextStyle(
+                                fontFamily: 'Helvetica',
+                                color: Globals.kUniversalColor,
+                                fontWeight: FontWeight.w400,
+                              ),
                             ),
                           ),
-                        ),
-                        PopupMenuItem<String>(
-                          onTap: () async {},
-                          value: 'User Role',
-                          child: Text(
-                            'User Role',
-                            style: TextStyle(
-                              fontFamily: 'Helvetica',
-                              color: Globals.kUniversalColor,
-                              fontWeight: FontWeight.w400,
+                        if (hasAccessRole)
+                          PopupMenuItem<String>(
+                            onTap: () async {},
+                            value: 'User Role',
+                            child: Text(
+                              'User Role',
+                              style: TextStyle(
+                                fontFamily: 'Helvetica',
+                                color: Globals.kUniversalColor,
+                                fontWeight: FontWeight.w400,
+                              ),
                             ),
                           ),
-                        ),
                       ],
                     ),
                   )

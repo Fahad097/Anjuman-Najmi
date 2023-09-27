@@ -78,21 +78,22 @@ class _PaginationState extends State<Pagination> {
                                     context: context,
                                     builder: (BuildContext context) =>
                                         ViewReceiptUnPaid(
-                                            id: state.receipt?[i].id ?? 0,
-                                            fullname:
-                                                state.receipt?[i].fullname,
-                                            amount: state.receipt?[i].hubAmount,
-                                            receiptdate:
-                                                state.receipt?[i].createdOn,
-                                            receiptCode:
-                                                state.receipt?[i].receiptCode,
-                                            itsNumber:
-                                                state.receipt?[i].itsNumber,
-                                            hubType: state.receipt?[i].hubType,
-                                            paymentMode:
-                                                state.receipt?[i].paymentMode,
-                                            isDeposit:
-                                                state.receipt?[i].isDeposited));
+                                          id: state.receipt?[i].id ?? 0,
+                                          fullname: state.receipt?[i].fullname,
+                                          amount: state.receipt?[i].hubAmount,
+                                          receiptdate:
+                                              state.receipt?[i].createdOn,
+                                          receiptCode:
+                                              state.receipt?[i].receiptCode,
+                                          itsNumber:
+                                              state.receipt?[i].itsNumber,
+                                          hubType: state.receipt?[i].hubType,
+                                          paymentMode:
+                                              state.receipt?[i].paymentMode,
+                                          isDeposit:
+                                              state.receipt?[i].isDeposited,
+                                          isDeshboard: false,
+                                        ));
                               },
                               child: Card(
                                 shadowColor: Globals.kUniversalColor,

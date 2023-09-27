@@ -1,3 +1,4 @@
+import 'package:anjuman_e_najmi/data/model/permission.dart';
 import 'package:anjuman_e_najmi/routes/routes_names.dart';
 import 'package:anjuman_e_najmi/views/profile/edit_profile.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,8 @@ class Profile extends StatelessWidget {
   final int? i;
   final String? btncheck;
   final UserModel? userModel;
+  bool hasWrite = permissionService.hasWritePermission('app.user');
+
   @override
   Widget build(BuildContext context) {
     final authCub = BlocProvider.of<AuthCubit>(context, listen: false);
@@ -51,58 +54,59 @@ class Profile extends StatelessWidget {
                         }
                       },
                     ),
-                    PopupMenuButton(
-                        padding: EdgeInsets.all(5),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(20.0),
-                            bottomRight: Radius.circular(20.0),
-                            topLeft: Radius.circular(20.0),
-                            topRight: Radius.circular(0),
+                    if (hasWrite)
+                      PopupMenuButton(
+                          padding: EdgeInsets.all(5),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(20.0),
+                              bottomRight: Radius.circular(20.0),
+                              topLeft: Radius.circular(20.0),
+                              topRight: Radius.circular(0),
+                            ),
                           ),
-                        ),
-                        icon: ImageIcon(
-                          AssetImage(AssetConfig.kMoreIcon),
-                          color: Colors.white,
-                        ),
-                        itemBuilder: (context) {
-                          return [
-                            PopupMenuItem<int>(
-                                value: 1,
-                                child: Row(
-                                  children: [
-                                    AssetProvider(
-                                        asset: AssetConfig.kreadwrite_Icon,
-                                        width: 20,
-                                        height: 20,
-                                        color: Color(0xff717171)),
-                                    SizedBox(
-                                      width: 3,
-                                    ),
-                                    Text("EditProfile",
-                                        style: TextStyle(
-                                          fontFamily: 'Helvetica',
-                                          color: Globals.kUniversalColor,
-                                          fontWeight: FontWeight.w400,
-                                        )),
-                                  ],
-                                )),
-                          ];
-                        },
-                        onSelected: (value) {
-                          if (value == 1) {
-                            if (btncheck == "GetUser") {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (_) => EditProfile(
-                                          btncheck: "GetUserEdit",
-                                          userModel: userModel)));
-                            } else {
-                              Navigator.pushNamed(context, editprofile);
+                          icon: ImageIcon(
+                            AssetImage(AssetConfig.kMoreIcon),
+                            color: Colors.white,
+                          ),
+                          itemBuilder: (context) {
+                            return [
+                              PopupMenuItem<int>(
+                                  value: 1,
+                                  child: Row(
+                                    children: [
+                                      AssetProvider(
+                                          asset: AssetConfig.kreadwrite_Icon,
+                                          width: 20,
+                                          height: 20,
+                                          color: Color(0xff717171)),
+                                      SizedBox(
+                                        width: 3,
+                                      ),
+                                      Text("EditProfile",
+                                          style: TextStyle(
+                                            fontFamily: 'Helvetica',
+                                            color: Globals.kUniversalColor,
+                                            fontWeight: FontWeight.w400,
+                                          )),
+                                    ],
+                                  )),
+                            ];
+                          },
+                          onSelected: (value) {
+                            if (value == 1) {
+                              if (btncheck == "GetUser") {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) => EditProfile(
+                                            btncheck: "GetUserEdit",
+                                            userModel: userModel)));
+                              } else {
+                                Navigator.pushNamed(context, editprofile);
+                              }
                             }
-                          }
-                        })
+                          })
                   ],
                 ),
               ),
@@ -203,96 +207,100 @@ class Profile extends StatelessWidget {
                                                     context) *
                                                 0.03,
                                           ),
-                                          DecoratedBox(
-                                            decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                border: Border.all(
-                                                    color: Globals
-                                                        .kUniversalColor)),
-                                            child: MaterialButton(
-                                              height: 50,
-                                              shape: RoundedRectangleBorder(
+                                          if (hasWrite)
+                                            DecoratedBox(
+                                              decoration: BoxDecoration(
                                                   borderRadius:
-                                                      BorderRadius.circular(
-                                                          10)),
-                                              minWidth: double.infinity,
-                                              onPressed: () {
-                                                Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (_) =>
-                                                            EditProfile(
-                                                                btncheck:
-                                                                    "GetUserEdit",
-                                                                userModel:
-                                                                    userModel)));
-                                              },
-                                              child: Text(
-                                                "Edit Profile",
-                                                style: TextStyle(
-                                                    fontFamily: 'Helvetica',
-                                                    fontWeight: FontWeight.w400,
-                                                    color:
-                                                        Globals.kUniversalColor,
-                                                    fontSize: 16),
+                                                      BorderRadius.circular(10),
+                                                  border: Border.all(
+                                                      color: Globals
+                                                          .kUniversalColor)),
+                                              child: MaterialButton(
+                                                height: 50,
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10)),
+                                                minWidth: double.infinity,
+                                                onPressed: () {
+                                                  Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (_) => EditProfile(
+                                                              btncheck:
+                                                                  "GetUserEdit",
+                                                              userModel:
+                                                                  userModel)));
+                                                },
+                                                child: Text(
+                                                  "Edit Profile",
+                                                  style: TextStyle(
+                                                      fontFamily: 'Helvetica',
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                      color: Globals
+                                                          .kUniversalColor,
+                                                      fontSize: 16),
+                                                ),
                                               ),
                                             ),
-                                          ),
                                           SizedBox(
                                             height: Globals.getDeviceHeight(
                                                     context) *
                                                 0.02,
                                           ),
-                                          DecoratedBox(
-                                            decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                gradient: LinearGradient(
-                                                    colors: [
-                                                      Color(0xff233C7E),
-                                                      Color(0xff456BD0)
-                                                    ])),
-                                            child: MaterialButton(
-                                              height: 50,
-                                              shape: RoundedRectangleBorder(
+                                          if (hasWrite)
+                                            DecoratedBox(
+                                              decoration: BoxDecoration(
                                                   borderRadius:
-                                                      BorderRadius.circular(
-                                                          10)),
-                                              minWidth: double.infinity,
-                                              onPressed: () {
-                                                // Navigator.pushNamed(
-                                                //   context, delete);
-                                                // context
-                                                //     .read<AuthCubit>()
-                                                //     .deleteAccount(context);
-                                                showDialog(
-                                                    context: context,
-                                                    builder: (BuildContext
-                                                            context) =>
-                                                        Globals.deleteAccount(
-                                                            context,
-                                                            () => context
-                                                                .read<
-                                                                    AuthCubit>()
-                                                                .deleteUserAccount(
-                                                                    context,
-                                                                    userModel
-                                                                            ?.id ??
-                                                                        0),
-                                                            () => Navigator.pop(
-                                                                context)));
-                                              },
-                                              child: Text(
-                                                "Delete Account",
-                                                style: TextStyle(
-                                                    fontFamily: 'Helvetica',
-                                                    fontWeight: FontWeight.w400,
-                                                    color: Colors.white,
-                                                    fontSize: 16),
+                                                      BorderRadius.circular(10),
+                                                  gradient: LinearGradient(
+                                                      colors: [
+                                                        Color(0xff233C7E),
+                                                        Color(0xff456BD0)
+                                                      ])),
+                                              child: MaterialButton(
+                                                height: 50,
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10)),
+                                                minWidth: double.infinity,
+                                                onPressed: () {
+                                                  // Navigator.pushNamed(
+                                                  //   context, delete);
+                                                  // context
+                                                  //     .read<AuthCubit>()
+                                                  //     .deleteAccount(context);
+                                                  showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext
+                                                              context) =>
+                                                          Globals.deleteAccount(
+                                                              context,
+                                                              () => context
+                                                                  .read<
+                                                                      AuthCubit>()
+                                                                  .deleteUserAccount(
+                                                                      context,
+                                                                      userModel
+                                                                              ?.id ??
+                                                                          0),
+                                                              () =>
+                                                                  Navigator.pop(
+                                                                      context)));
+                                                },
+                                                child: Text(
+                                                  "Delete Account",
+                                                  style: TextStyle(
+                                                      fontFamily: 'Helvetica',
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                      color: Colors.white,
+                                                      fontSize: 16),
+                                                ),
                                               ),
                                             ),
-                                          ),
                                         ]),
                                   )
                                 ]));

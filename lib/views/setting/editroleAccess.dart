@@ -122,7 +122,7 @@ class _EditRoleAccessState extends State<EditRoleAccess> {
   }
 
   String dropdownValue = 'No Access';
-
+  bool hasWrite = permissionService.hasWritePermission('app.user_role');
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -270,6 +270,7 @@ class _EditRoleAccessState extends State<EditRoleAccess> {
                         // editRowtext( "Role: ", widget.name ?? ""),
                         editRowtext(
                             context,
+                            hasWrite,
                             "Role:  ",
                             widget.name ?? "",
                             (value) => value.isNotEmpty &&
@@ -342,41 +343,62 @@ class _EditRoleAccessState extends State<EditRoleAccess> {
                                             padding: EdgeInsets.symmetric(
                                                 horizontal: 10),
                                             child: DropdownButtonHideUnderline(
-                                              child: DropdownButton(
-                                                onChanged: (newValue) {
-                                                  String code = state
-                                                          .rolepermissionList?[
-                                                              index]
-                                                          .code ??
-                                                      "";
-                                                  print("Fahad" + code);
-                                                  var roles = state
-                                                      .selectedDropdownValues;
-                                                   BlocProvider.of<RoleCubit>(
-                                                          context)
-                                                      .editTempRole(
-                                                          code,
-                                                          newValue.toString(),
-                                                          roles);
-                                                  BlocProvider.of<RoleCubit>(
-                                                          context)
-                                                      .updateDropdown(
-                                                          index, newValue!);
-                                                },
-                                                icon: ImageIcon(
-                                                  AssetImage(AssetConfig
-                                                      .kdropdownIcon),
-                                                  color: Color(0xff86A3F0),
-                                                  size: 12,
-                                                ),
-                                                borderRadius:
-                                                    BorderRadius.circular(20),
-                                                // Provide a default value if null
-                                                value: state.selectedDropdownValues?[
-                                                        index] ??
-                                                    "", // Use the selected value from the list
-                                                items: dropdownItems,
-                                              ),
+                                              child: (hasWrite)
+                                                  ? DropdownButton(
+                                                      onChanged: (newValue) {
+                                                        String code = state
+                                                                .rolepermissionList?[
+                                                                    index]
+                                                                .code ??
+                                                            "";
+                                                        print("Fahad" + code);
+                                                        var roles = state
+                                                            .selectedDropdownValues;
+                                                        BlocProvider.of<
+                                                                    RoleCubit>(
+                                                                context)
+                                                            .editTempRole(
+                                                                code,
+                                                                newValue
+                                                                    .toString(),
+                                                                roles);
+                                                        BlocProvider.of<
+                                                                    RoleCubit>(
+                                                                context)
+                                                            .updateDropdown(
+                                                                index,
+                                                                newValue!);
+                                                      },
+                                                      icon: ImageIcon(
+                                                        AssetImage(AssetConfig
+                                                            .kdropdownIcon),
+                                                        color:
+                                                            Color(0xff86A3F0),
+                                                        size: 12,
+                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20),
+                                                      // Provide a default value if null
+                                                      value: state.selectedDropdownValues?[
+                                                              index] ??
+                                                          "", // Use the selected value from the list
+                                                      items: dropdownItems,
+                                                    )
+                                                  : DropdownButton<String>(
+                                                      value: state.selectedDropdownValues?[
+                                                              index] ??
+                                                          "", // The currently selected item (non-interactive)
+                                                      items: dropdownItems,
+                                                      onChanged: null,
+                                                      isDense:
+                                                          true, // Reduces the height of the dropdown button
+
+                                                      icon: SizedBox(),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20), // Disable the onChanged callback
+                                                    ),
                                             ),
                                           ),
                                           title: Text(state
@@ -393,49 +415,50 @@ class _EditRoleAccessState extends State<EditRoleAccess> {
                         SizedBox(
                           height: 5,
                         ),
-                        DecoratedBox(
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              gradient: LinearGradient(colors: [
-                                Color(0xff233C7E),
-                                Color(0xff456BD0)
-                              ])),
-                          child: MaterialButton(
-                            height: 50,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10)),
-                            minWidth: MediaQuery.of(context).size.width * 0.8,
-                            //  color: Globals.kUniversalColor,
-                            onPressed: (isloadingBtn == false)
-                                ? () async {
-                                    setState(() {
-                                      isloadingBtn = true;
-                                    });
-                                    if (roleKey.currentState!.validate()) {
-                                      await context
-                                          .read<RoleCubit>()
-                                          .editUserRole(context, widget.id);
-                                      await context
-                                          .read<RoleCubit>()
-                                          .editrole(widget.name ?? "");
+                        if (hasWrite)
+                          DecoratedBox(
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                gradient: LinearGradient(colors: [
+                                  Color(0xff233C7E),
+                                  Color(0xff456BD0)
+                                ])),
+                            child: MaterialButton(
+                              height: 50,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10)),
+                              minWidth: MediaQuery.of(context).size.width * 0.8,
+                              //  color: Globals.kUniversalColor,
+                              onPressed: (isloadingBtn == false)
+                                  ? () async {
+                                      setState(() {
+                                        isloadingBtn = true;
+                                      });
+                                      if (roleKey.currentState!.validate()) {
+                                        await context
+                                            .read<RoleCubit>()
+                                            .editUserRole(context, widget.id);
+                                        await context
+                                            .read<RoleCubit>()
+                                            .editrole(widget.name ?? "");
+                                      }
+                                      setState(() {
+                                        isloadingBtn = false;
+                                      });
                                     }
-                                    setState(() {
-                                      isloadingBtn = false;
-                                    });
-                                  }
-                                : null,
-                            child: (isloadingBtn == false)
-                                ? Text(
-                                    "Update",
-                                    style: TextStyle(
-                                        fontFamily: 'Helvetica',
-                                        fontWeight: FontWeight.w400,
-                                        color: Colors.white,
-                                        fontSize: 16),
-                                  )
-                                : CircularProgressIndicator(),
+                                  : null,
+                              child: (isloadingBtn == false)
+                                  ? Text(
+                                      "Update",
+                                      style: TextStyle(
+                                          fontFamily: 'Helvetica',
+                                          fontWeight: FontWeight.w400,
+                                          color: Colors.white,
+                                          fontSize: 16),
+                                    )
+                                  : CircularProgressIndicator(),
+                            ),
                           ),
-                        ),
                       ],
                     ),
                   ),
@@ -446,7 +469,7 @@ class _EditRoleAccessState extends State<EditRoleAccess> {
   }
 }
 
-Widget editRowtext(context, String title, String detail,
+Widget editRowtext(context, bool permission, String title, String detail,
     Function(String) onChanged, String? Function(String?) validator) {
   return Column(
     mainAxisAlignment: MainAxisAlignment.end,
@@ -468,6 +491,7 @@ Widget editRowtext(context, String title, String detail,
             width: Globals.getDeviceWidth(context) * 0.35,
             child: TextFormField(
               initialValue: detail,
+              enabled: (permission) ? true : false,
               keyboardType: TextInputType.text,
               onChanged: onChanged,
               validator: validator,

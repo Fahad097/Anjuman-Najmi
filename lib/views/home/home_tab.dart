@@ -37,8 +37,6 @@ class _HomeTabState extends State<HomeTab> {
   @override
   Widget build(BuildContext context) {
     bool hasAccess = permissionService.hasPermission('app.dashboard.receipt');
-    print("My LIST" + permissionService.userPermissions.toString());
-    print("My LIST" + hasAccess.toString());
     final authCub = BlocProvider.of<AuthCubit>(context, listen: false);
 
     return Scaffold(
@@ -157,17 +155,7 @@ class _HomeTabState extends State<HomeTab> {
                       SizedBox(
                         height: Globals.getDeviceHeight(context) * 0.03,
                       ),
-                      // (state.accesses?[0].childResources?[0].access == "w" ||
-                      //             state.accesses?[0].childResources?[0]
-                      //                     .access ==
-                      //                 "r") &&
-                      //         (state.accesses?[0].access != "n")
-                      // (state.permission == "w" ||
-                      //             response.userModel?.permissions!
-                      //                     .appDashboard ==
-                      //                 "r") &&
-                      //         (state.permission != "n")
-                      //    ?
+
                       (isloading == true)
                           ? (!hasAccess)
                               ? SizedBox()
@@ -291,8 +279,6 @@ class DashboardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DateTime now = DateTime.now();
-
     return BlocBuilder<ReceiptCubit, ReceiptState>(builder: (context, state) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -353,6 +339,7 @@ class DashboardWidget extends StatelessWidget {
                                 hubType: state.receipt?[i].hubType,
                                 paymentMode: state.receipt?[i].paymentMode,
                                 isDeposit: state.receipt?[i].isDeposited,
+                                isDeshboard: true,
                               ));
                     },
                     child: Card(
