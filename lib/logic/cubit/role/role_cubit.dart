@@ -185,8 +185,7 @@ class RoleCubit extends Cubit<RoleState> {
     Navigator.pop(context);
   }
 
- 
-void editTempRole(String code, String access, List<String>? mylist) {
+  void editTempRole(String code, String access, List<String>? mylist) {
     // Create a copy of the existing permissions map
     int i = 0;
     final Map<String, String> updatedPermissions =
@@ -211,11 +210,12 @@ void editTempRole(String code, String access, List<String>? mylist) {
 
   void addTempRole(String code, String access) {
     // Create a copy of the existing permissions map
+
     final Map<String, String> updatedPermissions =
         Map.from(state.permission ?? {});
 
     // Update or add the new permission
-    updatedPermissions[code] = access;
+    if (access != '') updatedPermissions[code] = access;
 
     // Initialize permissions for codes that don't have an entry with "n"
     for (final rolePermission in state.rolepermissionList ?? []) {

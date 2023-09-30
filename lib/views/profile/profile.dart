@@ -147,161 +147,179 @@ class Profile extends StatelessWidget {
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(20),
                                         color: Colors.white),
-                                    child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          SizedBox(
-                                            height: Globals.getDeviceHeight(
-                                                    context) *
-                                                0.04,
-                                          ),
-                                          Row(
+                                    child: (userModel?.roleName == '')
+                                        ? Center(
+                                            child: CircularProgressIndicator(),
+                                          )
+                                        : Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              CircleAvatar(
-                                                backgroundColor:
-                                                    Color(0xffE6E6E6),
-                                                radius: 25,
-                                                child: Icon(
-                                                  Icons.person,
-                                                  color: Color(0xffCCCCCC),
-                                                  size: 24,
+                                                SizedBox(
+                                                  height:
+                                                      Globals.getDeviceHeight(
+                                                              context) *
+                                                          0.04,
                                                 ),
-                                              ),
-                                              SizedBox(
-                                                width: Globals.getDeviceWidth(
-                                                        context) *
-                                                    0.09,
-                                              ),
-                                              Text(
-                                                  Globals
-                                                      .isTextNullOrEmptyString(
-                                                          userModel?.fullname),
-                                                  //"Marcel galliard",
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                      fontFamily: 'Helvetica',
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      color: Color(0xff666666),
-                                                      fontSize: 24)),
-                                            ],
-                                          ),
-                                          SizedBox(
-                                            height: Globals.getDeviceHeight(
-                                                    context) *
-                                                0.03,
-                                          ),
-                                          profileRowtext(
-                                              context,
-                                              "Role: ",
-                                              Globals.isTextNullOrEmptyString(
-                                                  userModel?.roleName)),
-                                          profileRowtext(
-                                              context,
-                                              "Email: ",
-                                              Globals.isTextNullOrEmptyString(
-                                                  userModel?.email)),
-                                          SizedBox(
-                                            height: Globals.getDeviceHeight(
-                                                    context) *
-                                                0.03,
-                                          ),
-                                          if (hasWrite)
-                                            DecoratedBox(
-                                              decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  border: Border.all(
-                                                      color: Globals
-                                                          .kUniversalColor)),
-                                              child: MaterialButton(
-                                                height: 50,
-                                                shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10)),
-                                                minWidth: double.infinity,
-                                                onPressed: () {
-                                                  Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (_) => EditProfile(
-                                                              btncheck:
-                                                                  "GetUserEdit",
-                                                              userModel:
-                                                                  userModel)));
-                                                },
-                                                child: Text(
-                                                  "Edit Profile",
-                                                  style: TextStyle(
-                                                      fontFamily: 'Helvetica',
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                      color: Globals
-                                                          .kUniversalColor,
-                                                      fontSize: 16),
+                                                Row(
+                                                  children: [
+                                                    CircleAvatar(
+                                                      backgroundColor:
+                                                          Color(0xffE6E6E6),
+                                                      radius: 25,
+                                                      child: Icon(
+                                                        Icons.person,
+                                                        color:
+                                                            Color(0xffCCCCCC),
+                                                        size: 24,
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: Globals
+                                                              .getDeviceWidth(
+                                                                  context) *
+                                                          0.09,
+                                                    ),
+                                                    Text(
+                                                        Globals
+                                                            .isTextNullOrEmptyString(
+                                                                userModel
+                                                                    ?.fullname),
+                                                        //"Marcel galliard",
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        style: TextStyle(
+                                                            fontFamily:
+                                                                'Helvetica',
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                            color: Color(
+                                                                0xff666666),
+                                                            fontSize: 24)),
+                                                  ],
                                                 ),
-                                              ),
-                                            ),
-                                          SizedBox(
-                                            height: Globals.getDeviceHeight(
-                                                    context) *
-                                                0.02,
-                                          ),
-                                          if (hasWrite)
-                                            DecoratedBox(
-                                              decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  gradient: LinearGradient(
-                                                      colors: [
-                                                        Color(0xff233C7E),
-                                                        Color(0xff456BD0)
-                                                      ])),
-                                              child: MaterialButton(
-                                                height: 50,
-                                                shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10)),
-                                                minWidth: double.infinity,
-                                                onPressed: () {
-                                                  // Navigator.pushNamed(
-                                                  //   context, delete);
-                                                  // context
-                                                  //     .read<AuthCubit>()
-                                                  //     .deleteAccount(context);
-                                                  showDialog(
-                                                      context: context,
-                                                      builder: (BuildContext
-                                                              context) =>
-                                                          Globals.deleteAccount(
-                                                              context,
-                                                              () => context
-                                                                  .read<
-                                                                      AuthCubit>()
-                                                                  .deleteUserAccount(
-                                                                      context,
-                                                                      userModel
-                                                                              ?.id ??
-                                                                          0),
-                                                              () =>
-                                                                  Navigator.pop(
-                                                                      context)));
-                                                },
-                                                child: Text(
-                                                  "Delete Account",
-                                                  style: TextStyle(
-                                                      fontFamily: 'Helvetica',
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                      color: Colors.white,
-                                                      fontSize: 16),
+                                                SizedBox(
+                                                  height:
+                                                      Globals.getDeviceHeight(
+                                                              context) *
+                                                          0.03,
                                                 ),
-                                              ),
-                                            ),
-                                        ]),
+                                                profileRowtext(
+                                                    context,
+                                                    "Role: ",
+                                                    Globals
+                                                        .isTextNullOrEmptyString(
+                                                            userModel
+                                                                ?.roleName)),
+                                                profileRowtext(
+                                                    context,
+                                                    "Email: ",
+                                                    Globals
+                                                        .isTextNullOrEmptyString(
+                                                            userModel?.email)),
+                                                SizedBox(
+                                                  height:
+                                                      Globals.getDeviceHeight(
+                                                              context) *
+                                                          0.03,
+                                                ),
+                                                DecoratedBox(
+                                                  decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                      border: Border.all(
+                                                          color: Globals
+                                                              .kUniversalColor)),
+                                                  child: MaterialButton(
+                                                    height: 50,
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10)),
+                                                    minWidth: double.infinity,
+                                                    onPressed: () {
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (_) =>
+                                                                  EditProfile(
+                                                                      btncheck:
+                                                                          "GetUserEdit",
+                                                                      userModel:
+                                                                          userModel)));
+                                                    },
+                                                    child: Text(
+                                                      "Edit Profile",
+                                                      style: TextStyle(
+                                                          fontFamily:
+                                                              'Helvetica',
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                          color: Globals
+                                                              .kUniversalColor,
+                                                          fontSize: 16),
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  height:
+                                                      Globals.getDeviceHeight(
+                                                              context) *
+                                                          0.02,
+                                                ),
+                                                DecoratedBox(
+                                                  decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                      gradient: LinearGradient(
+                                                          colors: [
+                                                            Color(0xff233C7E),
+                                                            Color(0xff456BD0)
+                                                          ])),
+                                                  child: MaterialButton(
+                                                    height: 50,
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10)),
+                                                    minWidth: double.infinity,
+                                                    onPressed: () {
+                                                      showDialog(
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                                  context) =>
+                                                              Globals.deleteAccount(
+                                                                  context,
+                                                                  () => context
+                                                                      .read<
+                                                                          AuthCubit>()
+                                                                      .deleteUserAccount(
+                                                                          context,
+                                                                          userModel?.id ??
+                                                                              0),
+                                                                  () => Navigator
+                                                                      .pop(
+                                                                          context)));
+                                                    },
+                                                    child: Text(
+                                                      "Delete Account",
+                                                      style: TextStyle(
+                                                          fontFamily:
+                                                              'Helvetica',
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                          color: Colors.white,
+                                                          fontSize: 16),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ]),
                                   )
                                 ]));
                       },
@@ -342,144 +360,170 @@ class Profile extends StatelessWidget {
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(20),
                                         color: Colors.white),
-                                    child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          SizedBox(
-                                            height: Globals.getDeviceHeight(
-                                                    context) *
-                                                0.04,
-                                          ),
-                                          Row(
+                                    child: (state.roleName == '')
+                                        ? Center(
+                                            child: CircularProgressIndicator(),
+                                          )
+                                        : Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              CircleAvatar(
-                                                backgroundColor:
-                                                    Color(0xffE6E6E6),
-                                                radius: 25,
-                                                child: Icon(
-                                                  Icons.person,
-                                                  color: Color(0xffCCCCCC),
-                                                  size: 24,
+                                                SizedBox(
+                                                  height:
+                                                      Globals.getDeviceHeight(
+                                                              context) *
+                                                          0.04,
                                                 ),
-                                              ),
-                                              SizedBox(
-                                                width: Globals.getDeviceWidth(
-                                                        context) *
-                                                    0.09,
-                                              ),
-                                              Text(
-                                                  Globals
-                                                      .isTextNullOrEmptyString(
-                                                          state.fullname),
-                                                  //"Marcel galliard",
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                      fontFamily: 'Helvetica',
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      color: Color(0xff666666),
-                                                      fontSize: 24)),
-                                            ],
-                                          ),
-                                          SizedBox(
-                                            height: Globals.getDeviceHeight(
-                                                    context) *
-                                                0.03,
-                                          ),
-                                          profileRowtext(
-                                              context,
-                                              "Role: ",
-                                              Globals.isTextNullOrEmptyString(
-                                                  state.roleName)),
-                                          profileRowtext(
-                                              context,
-                                              "Email: ",
-                                              Globals.isTextNullOrEmptyString(
-                                                  state.email)),
-                                          SizedBox(
-                                            height: Globals.getDeviceHeight(
-                                                    context) *
-                                                0.03,
-                                          ),
-                                          DecoratedBox(
-                                            decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                border: Border.all(
-                                                    color: Globals
-                                                        .kUniversalColor)),
-                                            child: MaterialButton(
-                                              height: 50,
-                                              shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10)),
-                                              minWidth: double.infinity,
-                                              onPressed: () {
-                                                Navigator.pushNamed(
-                                                    context, editprofile);
-                                              },
-                                              child: Text(
-                                                "Edit Profile",
-                                                style: TextStyle(
-                                                    fontFamily: 'Helvetica',
-                                                    fontWeight: FontWeight.w400,
-                                                    color:
-                                                        Globals.kUniversalColor,
-                                                    fontSize: 16),
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            height: Globals.getDeviceHeight(
-                                                    context) *
-                                                0.02,
-                                          ),
-                                          DecoratedBox(
-                                            decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                gradient: LinearGradient(
-                                                    colors: [
-                                                      Color(0xff233C7E),
-                                                      Color(0xff456BD0)
-                                                    ])),
-                                            child: MaterialButton(
-                                              height: 50,
-                                              shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10)),
-                                              minWidth: double.infinity,
-                                              onPressed: () {
-                                                showDialog(
-                                                    context: context,
-                                                    builder: (BuildContext
-                                                            context) =>
-                                                        Globals.deleteAccount(
-                                                            context,
-                                                            () => context
-                                                                .read<
-                                                                    AuthCubit>()
-                                                                .deleteAccount(
-                                                                    context,
-                                                                    authCub
-                                                                        .getuserID),
-                                                            () => Navigator.pop(
-                                                                context)));
-                                              },
-                                              child: Text(
-                                                "Delete Account",
-                                                style: TextStyle(
-                                                    fontFamily: 'Helvetica',
-                                                    fontWeight: FontWeight.w400,
-                                                    color: Colors.white,
-                                                    fontSize: 16),
-                                              ),
-                                            ),
-                                          ),
-                                        ]),
+                                                Row(
+                                                  children: [
+                                                    CircleAvatar(
+                                                      backgroundColor:
+                                                          Color(0xffE6E6E6),
+                                                      radius: 25,
+                                                      child: Icon(
+                                                        Icons.person,
+                                                        color:
+                                                            Color(0xffCCCCCC),
+                                                        size: 24,
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: Globals
+                                                              .getDeviceWidth(
+                                                                  context) *
+                                                          0.09,
+                                                    ),
+                                                    Text(
+                                                        Globals
+                                                            .isTextNullOrEmptyString(
+                                                                state.fullname),
+                                                        //"Marcel galliard",
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        style: TextStyle(
+                                                            fontFamily:
+                                                                'Helvetica',
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                            color: Color(
+                                                                0xff666666),
+                                                            fontSize: 24)),
+                                                  ],
+                                                ),
+                                                SizedBox(
+                                                  height:
+                                                      Globals.getDeviceHeight(
+                                                              context) *
+                                                          0.03,
+                                                ),
+                                                profileRowtext(
+                                                    context,
+                                                    "Role: ",
+                                                    Globals
+                                                        .isTextNullOrEmptyString(
+                                                            state.roleName)),
+                                                profileRowtext(
+                                                    context,
+                                                    "Email: ",
+                                                    Globals
+                                                        .isTextNullOrEmptyString(
+                                                            state.email)),
+                                                SizedBox(
+                                                  height:
+                                                      Globals.getDeviceHeight(
+                                                              context) *
+                                                          0.03,
+                                                ),
+                                                DecoratedBox(
+                                                  decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                      border: Border.all(
+                                                          color: Globals
+                                                              .kUniversalColor)),
+                                                  child: MaterialButton(
+                                                    height: 50,
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10)),
+                                                    minWidth: double.infinity,
+                                                    onPressed: () {
+                                                      Navigator.pushNamed(
+                                                          context, editprofile);
+                                                    },
+                                                    child: Text(
+                                                      "Edit Profile",
+                                                      style: TextStyle(
+                                                          fontFamily:
+                                                              'Helvetica',
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                          color: Globals
+                                                              .kUniversalColor,
+                                                          fontSize: 16),
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  height:
+                                                      Globals.getDeviceHeight(
+                                                              context) *
+                                                          0.02,
+                                                ),
+                                                DecoratedBox(
+                                                  decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                      gradient: LinearGradient(
+                                                          colors: [
+                                                            Color(0xff233C7E),
+                                                            Color(0xff456BD0)
+                                                          ])),
+                                                  child: MaterialButton(
+                                                    height: 50,
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10)),
+                                                    minWidth: double.infinity,
+                                                    onPressed: () {
+                                                      showDialog(
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                                  context) =>
+                                                              Globals.deleteAccount(
+                                                                  context,
+                                                                  () => context
+                                                                      .read<
+                                                                          AuthCubit>()
+                                                                      .deleteAccount(
+                                                                          context,
+                                                                          authCub
+                                                                              .getuserID),
+                                                                  () => Navigator
+                                                                      .pop(
+                                                                          context)));
+                                                    },
+                                                    child: Text(
+                                                      "Delete Account",
+                                                      style: TextStyle(
+                                                          fontFamily:
+                                                              'Helvetica',
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                          color: Colors.white,
+                                                          fontSize: 16),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ]),
                                   )
                                 ]));
                       },

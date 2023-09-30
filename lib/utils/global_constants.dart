@@ -28,7 +28,7 @@ class Globals {
   static showToast(var txt) {
     Fluttertoast.showToast(
         msg: txt,
-        toastLength: Toast.LENGTH_SHORT,
+        toastLength: Toast.LENGTH_LONG,
         gravity: ToastGravity.BOTTOM,
         timeInSecForIosWeb: 2,
         backgroundColor: Colors.black,
@@ -143,148 +143,174 @@ class Globals {
   }
 
   static receiptpaidDialog(context, Function() confim, Function() cancel) {
-    return AlertDialog(
-        insetPadding: EdgeInsets.only(
-            left: isLandscape(context) ? 90 : 15,
-            right: isLandscape(context) ? 90 : 15,
-            //  top: isLandscape(context) ? 30 : 160,
-            bottom: 0),
-        //     const EdgeInsets.only(left: 15, right: 15, top: 35, bottom: 35),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        shadowColor: Globals.kTextFieldFilledColor,
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              "Are you sure you want to paid Receipt?",
+    return BlocBuilder<ReceiptCubit, ReceiptState>(
+      builder: (context, state) {
+        return AlertDialog(
+            insetPadding: EdgeInsets.only(
+                left: isLandscape(context) ? 90 : 15,
+                right: isLandscape(context) ? 90 : 15,
+                //  top: isLandscape(context) ? 30 : 160,
+                bottom: 0),
+            //     const EdgeInsets.only(left: 15, right: 15, top: 35, bottom: 35),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            shadowColor: Globals.kTextFieldFilledColor,
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  "Are you sure you want to paid Receipt?",
 
-              //    "Are you sure you want to ${BlocProvider.of<ReceiptCubit>(context).state.isCheck! ? "Paid" : "Unpaid"} Receipt?",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  fontFamily: 'Helvetica',
-                  fontWeight: FontWeight.w400,
-                  color: Color(0xff525252),
-                  fontSize: 16),
-            ),
-            SizedBox(
-              height: Globals.getDeviceHeight(context) * 0.04,
-            ),
-            Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-              Container(
-                height: 40,
-                width: 100,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    border: Border.all(color: Color(0xff456BD0), width: 1.2),
-                    gradient: LinearGradient(
-                        colors: [Color(0xff233C7E), Color(0xff456BD0)])),
-                child: MaterialButton(
-                  onPressed: confim,
-                  child: Text(
-                    "Confirm",
-                    style: TextStyle(
-                        fontFamily: 'Helvetica',
-                        fontWeight: FontWeight.w400,
-                        color: Colors.white,
-                        fontSize: 16),
-                  ),
+                  //    "Are you sure you want to ${BlocProvider.of<ReceiptCubit>(context).state.isCheck! ? "Paid" : "Unpaid"} Receipt?",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontFamily: 'Helvetica',
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xff525252),
+                      fontSize: 16),
                 ),
-              ),
-              Container(
-                height: 40,
-                width: 100,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  border: Border.all(color: Color(0xff456BD0), width: 1.2),
+                SizedBox(
+                  height: Globals.getDeviceHeight(context) * 0.04,
                 ),
-                child: MaterialButton(
-                  onPressed: cancel,
-                  child: Text(
-                    "Cancel",
-                    style: TextStyle(
-                        fontFamily: 'Helvetica',
-                        fontWeight: FontWeight.w400,
-                        color: Globals.kUniversalColor,
-                        fontSize: 16),
-                  ),
-                ),
-              ),
-            ]),
-          ],
-        ));
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Container(
+                        height: 40,
+                        width: 100,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            border: Border.all(
+                                color: Color(0xff456BD0), width: 1.2),
+                            gradient: LinearGradient(colors: [
+                              Color(0xff233C7E),
+                              Color(0xff456BD0)
+                            ])),
+                        child: MaterialButton(
+                          onPressed: confim,
+                          child: state.isloading ?? false
+                              ? CircularProgressIndicator()
+                              : Text(
+                                  "Confirm",
+                                  style: TextStyle(
+                                      fontFamily: 'Helvetica',
+                                      fontWeight: FontWeight.w400,
+                                      color: Colors.white,
+                                      fontSize: 16),
+                                ),
+                        ),
+                      ),
+                      Container(
+                        height: 40,
+                        width: 100,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                          border:
+                              Border.all(color: Color(0xff456BD0), width: 1.2),
+                        ),
+                        child: MaterialButton(
+                          onPressed: cancel,
+                          child: Text(
+                            "Cancel",
+                            style: TextStyle(
+                                fontFamily: 'Helvetica',
+                                fontWeight: FontWeight.w400,
+                                color: Globals.kUniversalColor,
+                                fontSize: 16),
+                          ),
+                        ),
+                      ),
+                    ]),
+              ],
+            ));
+      },
+    );
   }
 
   static receiptunpaidDialog(context, Function() confim, Function() cancel) {
-    return AlertDialog(
-        insetPadding: EdgeInsets.only(
-            left: isLandscape(context) ? 90 : 15,
-            right: isLandscape(context) ? 90 : 15,
-            // top: isLandscape(context) ? 30 : 160,
-            bottom: 0),
-        //     const EdgeInsets.only(left: 15, right: 15, top: 35, bottom: 35),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        shadowColor: Globals.kTextFieldFilledColor,
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              "Are you sure you want to unpaid Receipt?",
-              //  ${  BlocProvider.of<ReceiptCubit>(context).state.isCheck! ? "Paid" : "Unpaid"} Receipt?",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  fontFamily: 'Helvetica',
-                  fontWeight: FontWeight.w400,
-                  color: Color(0xff525252),
-                  fontSize: 16),
-            ),
-            SizedBox(
-              height: Globals.getDeviceHeight(context) * 0.04,
-            ),
-            Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-              Container(
-                height: 40,
-                width: 100,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    border: Border.all(color: Color(0xff456BD0), width: 1.2),
-                    gradient: LinearGradient(
-                        colors: [Color(0xff233C7E), Color(0xff456BD0)])),
-                child: MaterialButton(
-                  onPressed: confim,
-                  child: Text(
-                    "Confirm",
-                    style: TextStyle(
-                        fontFamily: 'Helvetica',
-                        fontWeight: FontWeight.w400,
-                        color: Colors.white,
-                        fontSize: 16),
-                  ),
+    return BlocBuilder<ReceiptCubit, ReceiptState>(
+      builder: (context, state) {
+        return AlertDialog(
+            insetPadding: EdgeInsets.only(
+                left: isLandscape(context) ? 90 : 15,
+                right: isLandscape(context) ? 90 : 15,
+                // top: isLandscape(context) ? 30 : 160,
+                bottom: 0),
+            //     const EdgeInsets.only(left: 15, right: 15, top: 35, bottom: 35),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            shadowColor: Globals.kTextFieldFilledColor,
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  "Are you sure you want to unpaid Receipt?",
+                  //  ${  BlocProvider.of<ReceiptCubit>(context).state.isCheck! ? "Paid" : "Unpaid"} Receipt?",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontFamily: 'Helvetica',
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xff525252),
+                      fontSize: 16),
                 ),
-              ),
-              Container(
-                height: 40,
-                width: 100,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  border: Border.all(color: Color(0xff456BD0), width: 1.2),
+                SizedBox(
+                  height: Globals.getDeviceHeight(context) * 0.04,
                 ),
-                child: MaterialButton(
-                  onPressed: cancel,
-                  child: Text(
-                    "Cancel",
-                    style: TextStyle(
-                        fontFamily: 'Helvetica',
-                        fontWeight: FontWeight.w400,
-                        color: Globals.kUniversalColor,
-                        fontSize: 16),
-                  ),
-                ),
-              ),
-            ]),
-          ],
-        ));
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Container(
+                        height: 40,
+                        width: 100,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            border: Border.all(
+                                color: Color(0xff456BD0), width: 1.2),
+                            gradient: LinearGradient(colors: [
+                              Color(0xff233C7E),
+                              Color(0xff456BD0)
+                            ])),
+                        child: MaterialButton(
+                          onPressed: confim,
+                          child: state.isloading ?? false
+                              ? CircularProgressIndicator()
+                              : Text(
+                                  "Confirm",
+                                  style: TextStyle(
+                                      fontFamily: 'Helvetica',
+                                      fontWeight: FontWeight.w400,
+                                      color: Colors.white,
+                                      fontSize: 16),
+                                ),
+                        ),
+                      ),
+                      Container(
+                        height: 40,
+                        width: 100,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                          border:
+                              Border.all(color: Color(0xff456BD0), width: 1.2),
+                        ),
+                        child: MaterialButton(
+                          onPressed: cancel,
+                          child: Text(
+                            "Cancel",
+                            style: TextStyle(
+                                fontFamily: 'Helvetica',
+                                fontWeight: FontWeight.w400,
+                                color: Globals.kUniversalColor,
+                                fontSize: 16),
+                          ),
+                        ),
+                      ),
+                    ]),
+              ],
+            ));
+      },
+    );
   }
 
   static receiptpaidStatus(BuildContext context) {
@@ -381,53 +407,44 @@ class Globals {
                     return Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          state.accesses?[1].childResources?[2].access == "w" ||
-                                  state.accesses?[1].childResources?[2]
-                                          .access ==
-                                      "r"
-                              ? DecoratedBox(
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20),
-                                      gradient: LinearGradient(colors: [
-                                        Color(0xff233C7E),
-                                        Color(0xff456BD0)
-                                      ])),
-                                  child: MaterialButton(
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(20)),
-                                    onPressed: () => showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) =>
-                                            Globals.receiptunpaidDialog(context,
-                                                () {
-                                              BlocProvider.of<ReceiptCubit>(
-                                                      context)
-                                                  .check(true);
-                                              Navigator.pop(context);
-                                              Navigator.pop(context);
-                                            }, () {
-                                              Navigator.pop(context);
-                                              Navigator.pop(context);
-                                            })),
-                                    child:
-                                        BlocBuilder<ReceiptCubit, ReceiptState>(
-                                      builder: (context, state) {
-                                        return Text(
-                                          //     state.isCheck! ?
-                                          "Mark Unpaid",
-                                          //    "Paid",
-                                          style: TextStyle(
-                                              fontFamily: 'Helvetica',
-                                              fontWeight: FontWeight.w400,
-                                              color: Colors.white,
-                                              fontSize: 16),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                )
-                              : SizedBox(),
+                          DecoratedBox(
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                gradient: LinearGradient(colors: [
+                                  Color(0xff233C7E),
+                                  Color(0xff456BD0)
+                                ])),
+                            child: MaterialButton(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20)),
+                              onPressed: () => showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) =>
+                                      Globals.receiptunpaidDialog(context, () {
+                                        BlocProvider.of<ReceiptCubit>(context)
+                                            .check(true);
+                                        Navigator.pop(context);
+                                        Navigator.pop(context);
+                                      }, () {
+                                        Navigator.pop(context);
+                                        Navigator.pop(context);
+                                      })),
+                              child: BlocBuilder<ReceiptCubit, ReceiptState>(
+                                builder: (context, state) {
+                                  return Text(
+                                    //     state.isCheck! ?
+                                    "Mark Unpaid",
+                                    //    "Paid",
+                                    style: TextStyle(
+                                        fontFamily: 'Helvetica',
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.white,
+                                        fontSize: 16),
+                                  );
+                                },
+                              ),
+                            ),
+                          )
                         ]);
                   },
                 ),
@@ -520,51 +537,45 @@ class Globals {
                     return Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          state.accesses?[1].childResources?[1].access == "w"
-                              ? DecoratedBox(
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20),
-                                      gradient: LinearGradient(colors: [
-                                        Color(0xff233C7E),
-                                        Color(0xff456BD0)
-                                      ])),
-                                  child: MaterialButton(
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(20)),
-                                    onPressed: () => showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) =>
-                                            Globals.receiptpaidDialog(context,
-                                                () {
-                                              BlocProvider.of<ReceiptCubit>(
-                                                      context)
-                                                  .check(true);
-                                              Navigator.pop(context);
-                                              Navigator.pop(context);
-                                            }, () {
-                                              Navigator.pop(context);
-                                              Navigator.pop(context);
-                                            })),
-                                    child:
-                                        BlocBuilder<ReceiptCubit, ReceiptState>(
-                                      builder: (context, state) {
-                                        return Text(
-                                          // state.isCheck! ?
-                                          //    "Unpaid",
-                                          //    :
-                                          "Mark Paid",
-                                          style: TextStyle(
-                                              fontFamily: 'Helvetica',
-                                              fontWeight: FontWeight.w400,
-                                              color: Colors.white,
-                                              fontSize: 16),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                )
-                              : SizedBox(),
+                          DecoratedBox(
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                gradient: LinearGradient(colors: [
+                                  Color(0xff233C7E),
+                                  Color(0xff456BD0)
+                                ])),
+                            child: MaterialButton(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20)),
+                              onPressed: () => showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) =>
+                                      Globals.receiptpaidDialog(context, () {
+                                        BlocProvider.of<ReceiptCubit>(context)
+                                            .check(true);
+                                        Navigator.pop(context);
+                                        Navigator.pop(context);
+                                      }, () {
+                                        Navigator.pop(context);
+                                        Navigator.pop(context);
+                                      })),
+                              child: BlocBuilder<ReceiptCubit, ReceiptState>(
+                                builder: (context, state) {
+                                  return Text(
+                                    // state.isCheck! ?
+                                    //    "Unpaid",
+                                    //    :
+                                    "Mark Paid",
+                                    style: TextStyle(
+                                        fontFamily: 'Helvetica',
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.white,
+                                        fontSize: 16),
+                                  );
+                                },
+                              ),
+                            ),
+                          )
                         ]);
                   },
                 ),

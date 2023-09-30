@@ -1,5 +1,8 @@
+import 'package:anjuman_e_najmi/views/receipt/viewReceiptPdf.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../data/model/permission.dart';
+import '../../../data/model/receipt_model.dart';
 import '../../../logic/cubit/authentication/auth_cubit.dart';
 import '../../../logic/cubit/receipt/receipt_cubit.dart';
 import '../../../utils/global_constants.dart';
@@ -7,31 +10,11 @@ import '../../../utils/landscape_mode.dart';
 import '../edit_receipt.dart';
 
 class ViewReceiptPaid extends StatefulWidget {
-  ViewReceiptPaid(
-      {super.key,
-      this.id,
-      this.fullname,
-      this.isDeposit,
-      this.amount,
-      this.receiptdate,
-      this.receiptCode,
-      this.hubType,
-      this.itsNumber,
-      this.paymentMode});
-  final int? id;
-  final String? fullname;
+  ViewReceiptPaid({super.key, this.index, this.receipt, this.isDeshboard});
 
-  final String? receiptdate;
-
-  final String? amount;
-
-  final String? receiptCode;
-  final int? isDeposit;
-  final int? hubType;
-
-  final int? paymentMode;
-
-  final int? itsNumber;
+  int? index;
+  List<ReceiptModel>? receipt;
+  bool? isDeshboard;
 
   @override
   State<ViewReceiptPaid> createState() => _ViewReceiptPaidState();
@@ -40,9 +23,14 @@ class ViewReceiptPaid extends StatefulWidget {
 class _ViewReceiptPaidState extends State<ViewReceiptPaid> {
   @override
   void initState() {
-    BlocProvider.of<ReceiptCubit>(context).getReceipt(widget.id ?? 0);
+    //  BlocProvider.of<ReceiptCubit>(context).getReceipt(widget.id ?? 0);
     super.initState();
   }
+
+  var hasWriteDashboard =
+      permissionService.hasWritePermission('app.dashboard.receipt');
+  var hasWrite = permissionService.hasWritePermission('app.receipt');
+  var hasWritePaid = permissionService.hasWritePermission('app.receipt.paid');
 
   Widget build(BuildContext context) {
     final authCub = BlocProvider.of<AuthCubit>(context, listen: false);
@@ -65,6 +53,7 @@ class _ViewReceiptPaidState extends State<ViewReceiptPaid> {
                 SizedBox(
                   height: Globals.getDeviceHeight(context) * 0.02,
                 ),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -77,24 +66,20 @@ class _ViewReceiptPaidState extends State<ViewReceiptPaid> {
                               context,
                               MaterialPageRoute(
                                   builder: (_) => EditReceipt(
-                                        receitId: widget.id ?? 0,
-                                        fullname: widget.fullname ?? "",
-                                        amount: widget.amount ?? "",
-                                        receiptdate: widget.receiptdate ?? "",
-                                        receiptCode: widget.receiptCode ?? "",
-                                        hubType: widget.hubType ?? 0,
-                                        paymentMode: widget.paymentMode ?? 0,
-                                        itsNumber: widget.itsNumber ?? 0,
+                                        index: widget.index,
+                                        receipt: state.receipt,
                                       )));
                         },
                         icon: Icon(Icons.edit)),
-                    Text("Receipt#${state.receiptCode ?? ""}",
+                    Text(
+                        "Receipt#${widget.receipt?[widget.index ?? 0].receiptCode}",
                         style: TextStyle(
                           fontFamily: 'Helvetica',
                           color: Color(0xff525252),
                           fontSize: 22,
                           fontWeight: FontWeight.w400,
                         )),
+
                     InkWell(
                       onTap: () {
                         Navigator.pop(context);
@@ -121,95 +106,150 @@ class _ViewReceiptPaidState extends State<ViewReceiptPaid> {
                 SizedBox(
                   height: Globals.getDeviceHeight(context) * 0.03,
                 ),
-                Globals.receiptDetailtext(
-                    context, "Receipt Name:", "${state.name ?? ""}"
+                Globals.receiptDetailtext(context, "Receipt Name:",
+                    "${widget.receipt?[widget.index ?? 0].fullname ?? ""}"
                     //  "XYZ"
                     ),
                 //  Globals.receiptDetailtext(context, "Name:", "${state.name}"),
-                Globals.receiptDetailtext(
-                    context, "Mohalla:", "${state.mohallah}"
+                Globals.receiptDetailtext(context, "Mohalla:",
+                    "${widget.receipt?[widget.index ?? 0].mohallahName ?? ""}"
                     // "Zainee"
                     ),
-                Globals.receiptDetailtext(context, "Receipt Date & Time:",
-                    "${state.dateController?.text}"
+                Globals.receiptDetailtext(
+                    context,
+                    "Receipt Date & Time:",
+                    //"${state.dateController?.text}"
+                    "${widget.receipt?[widget.index ?? 0].createdOn}"
                     //  "10-05-2021 05:10:30"
                     ),
-                Globals.receiptDetailtext(
-                    context, "MOP:", "${state.paymentMode}"
+                Globals.receiptDetailtext(context, "MOP:",
+                    "${widget.receipt?[widget.index ?? 0].paymentTitle ?? ""}"
+
                     // "Cash"
                     ),
-                Globals.receiptDetailtext(context, "Amount:", "${state.amount}"
+                Globals.receiptDetailtext(context, "Amount:",
+                    "${widget.receipt?[widget.index ?? 0].hubAmount ?? ""}"
                     //   "150.00"
                     ),
-                Globals.receiptDetailtext(
-                    context, "Receipt Made By:", "${authCub.getUserName}"),
+                Globals.receiptDetailtext(context, "Receipt Made By:",
+                    "${widget.receipt?[widget.index ?? 0].createdBy}"),
+
                 BlocBuilder<AuthCubit, AuthState>(
                   builder: (context, state) {
                     return Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          state.accesses?[1].childResources?[1].access == "w"
-                              ? DecoratedBox(
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20),
-                                      gradient: LinearGradient(colors: [
-                                        Color(0xff233C7E),
-                                        Color(0xff456BD0)
-                                      ])),
-                                  child: MaterialButton(
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(20)),
-                                    onPressed: () => showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) =>
-                                            Globals.receiptunpaidDialog(context,
-                                                () {
-                                              BlocProvider.of<ReceiptCubit>(
-                                                      context)
-                                                  .check(true);
-                                              BlocProvider.of<ReceiptCubit>(
-                                                      context)
-                                                  .markUnpaid(
-                                                      context, widget.id ?? 0);
-                                              Navigator.pop(context);
-                                              Navigator.pop(context);
-                                            }, () {
-                                              Navigator.pop(context);
-                                              Navigator.pop(context);
-                                            })),
-                                    child:
-                                        BlocBuilder<ReceiptCubit, ReceiptState>(
-                                      builder: (context, state) {
-                                        return Text(
-                                          state.isDeposit == 0
-                                              ? "Unpaid"
-                                              : "Mark Paid",
-                                          style: TextStyle(
-                                              fontFamily: 'Helvetica',
-                                              fontWeight: FontWeight.w400,
-                                              color: Colors.white,
-                                              fontSize: 16),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                )
-                              : SizedBox(),
-                          IconButton(
-                              onPressed: () {
-                                BlocProvider.of<ReceiptCubit>(context)
-                                    .deleteReceipt(widget.id ?? 0);
+                          if (hasWritePaid)
+                            DecoratedBox(
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  gradient: LinearGradient(colors: [
+                                    Color(0xff233C7E),
+                                    Color(0xff456BD0)
+                                  ])),
+                              child: MaterialButton(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20)),
+                                onPressed: () => showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) =>
+                                        Globals.receiptunpaidDialog(context,
+                                            () async {
+                                          await BlocProvider.of<ReceiptCubit>(
+                                                  context)
+                                              .markUnpaid(
+                                                  context,
+                                                  widget.receipt ?? [],
+                                                  widget.index ?? 0);
+                                          await BlocProvider.of<ReceiptCubit>(
+                                                  context)
+                                              .getpaid(limit: 4, Globals.paid);
 
-                                Navigator.pop(context);
-                              },
-                              icon: Icon(
-                                Icons.delete,
-                                size: 30,
-                                color: Color(0xff456BD0),
-                              )),
+                                          Navigator.pop(context);
+                                          Navigator.pop(context);
+                                        }, () {
+                                          Navigator.pop(context);
+                                          Navigator.pop(context);
+                                        })),
+                                child: BlocBuilder<ReceiptCubit, ReceiptState>(
+                                  builder: (context, state) {
+                                    return Text(
+                                      widget.receipt?[widget.index ?? 0]
+                                                  .isDeposited ==
+                                              1
+                                          ? "Unpaid"
+                                          : "Mark Paid",
+                                      style: TextStyle(
+                                          fontFamily: 'Helvetica',
+                                          fontWeight: FontWeight.w400,
+                                          color: Colors.white,
+                                          fontSize: 16),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          if (!hasWritePaid) SizedBox(),
+                          if (widget.isDeshboard == true)
+                            if (hasWriteDashboard)
+                              IconButton(
+                                  onPressed: () {
+                                    BlocProvider.of<ReceiptCubit>(context)
+                                        .deleteReceipt(widget
+                                                .receipt?[widget.index ?? 0]
+                                                .id ??
+                                            0);
+
+                                    Navigator.pop(context);
+                                  },
+                                  icon: Icon(
+                                    Icons.delete,
+                                    size: 30,
+                                    color: Color(0xff456BD0),
+                                  )),
+                          if (widget.isDeshboard == false)
+                            if (hasWrite)
+                              IconButton(
+                                  onPressed: () async {
+                                    await BlocProvider.of<ReceiptCubit>(context)
+                                        .deleteReceipt(widget
+                                                .receipt?[widget.index ?? 0]
+                                                .id ??
+                                            0);
+                                    await BlocProvider.of<ReceiptCubit>(context)
+                                        .getpaid(limit: 4, Globals.paid);
+
+                                    await Globals.showToast(
+                                        " Receipt deleted successfully");
+                                    Navigator.pop(context);
+                                  },
+                                  icon: Icon(
+                                    Icons.delete,
+                                    size: 30,
+                                    color: Color(0xff456BD0),
+                                  )),
                         ]);
                   },
+                ),
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: InkWell(
+                      child: Text(
+                        'View Pdf',
+                        style: TextStyle(color: Color(0xff456BD0)),
+                      ),
+                      onTap: () {
+                        print(widget.receipt![widget.index ?? 0].id);
+                        BlocProvider.of<ReceiptCubit>(context).getReceiptURL(
+                            widget.receipt![widget.index ?? 0].id ?? 0);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: ((context) => ViewReceiptPdf())));
+                      },
+                    ),
+                  ),
                 ),
               ],
             ),

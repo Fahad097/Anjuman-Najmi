@@ -416,47 +416,51 @@ class _EditRoleAccessState extends State<EditRoleAccess> {
                           height: 5,
                         ),
                         if (hasWrite)
-                          DecoratedBox(
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                gradient: LinearGradient(colors: [
-                                  Color(0xff233C7E),
-                                  Color(0xff456BD0)
-                                ])),
-                            child: MaterialButton(
-                              height: 50,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10)),
-                              minWidth: MediaQuery.of(context).size.width * 0.8,
-                              //  color: Globals.kUniversalColor,
-                              onPressed: (isloadingBtn == false)
-                                  ? () async {
-                                      setState(() {
-                                        isloadingBtn = true;
-                                      });
-                                      if (roleKey.currentState!.validate()) {
-                                        await context
-                                            .read<RoleCubit>()
-                                            .editUserRole(context, widget.id);
-                                        await context
-                                            .read<RoleCubit>()
-                                            .editrole(widget.name ?? "");
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  gradient: LinearGradient(colors: [
+                                    Color(0xff233C7E),
+                                    Color(0xff456BD0)
+                                  ])),
+                              child: MaterialButton(
+                                height: 50,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10)),
+                                minWidth:
+                                    MediaQuery.of(context).size.width * 0.8,
+                                //  color: Globals.kUniversalColor,
+                                onPressed: (isloadingBtn == false)
+                                    ? () async {
+                                        setState(() {
+                                          isloadingBtn = true;
+                                        });
+                                        if (roleKey.currentState!.validate()) {
+                                          await context
+                                              .read<RoleCubit>()
+                                              .editUserRole(context, widget.id);
+                                          await context
+                                              .read<RoleCubit>()
+                                              .editrole(widget.name ?? "");
+                                        }
+                                        setState(() {
+                                          isloadingBtn = false;
+                                        });
                                       }
-                                      setState(() {
-                                        isloadingBtn = false;
-                                      });
-                                    }
-                                  : null,
-                              child: (isloadingBtn == false)
-                                  ? Text(
-                                      "Update",
-                                      style: TextStyle(
-                                          fontFamily: 'Helvetica',
-                                          fontWeight: FontWeight.w400,
-                                          color: Colors.white,
-                                          fontSize: 16),
-                                    )
-                                  : CircularProgressIndicator(),
+                                    : null,
+                                child: (isloadingBtn == false)
+                                    ? Text(
+                                        "Update",
+                                        style: TextStyle(
+                                            fontFamily: 'Helvetica',
+                                            fontWeight: FontWeight.w400,
+                                            color: Colors.white,
+                                            fontSize: 16),
+                                      )
+                                    : CircularProgressIndicator(),
+                              ),
                             ),
                           ),
                       ],

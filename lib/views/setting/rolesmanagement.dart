@@ -4,7 +4,6 @@ import 'package:anjuman_e_najmi/utils/landscape_mode.dart';
 import 'package:anjuman_e_najmi/views/setting/page_access_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../data/model/adduser_role.dart';
 import '../../logic/cubit/role/role_cubit.dart';
 import '../../routes/routes_names.dart';
 import '../../utils/global_constants.dart';
@@ -23,10 +22,19 @@ class _RolesManagementState extends State<RolesManagement> {
   bool value = false;
   bool btncheck = false;
   bool isloading = false;
+  void _loadData() async {
+    await BlocProvider.of<RoleCubit>(context).permission(widget.add.toString());
+    await BlocProvider.of<RoleCubit>(context).initializeDropDown();
+    String code = BlocProvider.of<RoleCubit>(context)
+            .state
+            .rolepermissionList?[index]
+            .code ??
+        "";
+    BlocProvider.of<RoleCubit>(context).addTempRole(code, '');
+  }
 
   void initState() {
-    BlocProvider.of<RoleCubit>(context).permission(widget.add.toString());
-    BlocProvider.of<RoleCubit>(context).initializeDropDown();
+    _loadData();
     super.initState();
   }
 
@@ -370,41 +378,43 @@ class _RolesManagementState extends State<RolesManagement> {
                       SizedBox(
                         height: 5,
                       ),
-                      DecoratedBox(
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            gradient: LinearGradient(colors: [
-                              Color(0xff233C7E),
-                              Color(0xff456BD0)
-                            ])),
-                        child: MaterialButton(
-                          height: 50,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                          minWidth: MediaQuery.of(context).size.width * 0.8,
-                          onPressed: (isloading == false)
-                              ? () async {
-                                  if (roleKey.currentState!.validate()) {
-                                    setState(() {
-                                      isloading = true;
-                                    });
-                                    await context
-                                        .read<RoleCubit>()
-                                        .addUserRole(context);
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              gradient: LinearGradient(colors: [
+                                Color(0xff233C7E),
+                                Color(0xff456BD0)
+                              ])),
+                          child: MaterialButton(
+                            height: 50,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
+                            minWidth: MediaQuery.of(context).size.width * 0.8,
+                            onPressed: (isloading == false)
+                                ? () async {
+                                    if (roleKey.currentState!.validate()) {
+                                      setState(() {
+                                        isloading = true;
+                                      });
+                                      await context
+                                          .read<RoleCubit>()
+                                          .addUserRole(context);
+                                    }
                                   }
-                                  
-                                }
-                              : null,
-                          child: (isloading == false)
-                              ? Text(
-                                  "Add Role",
-                                  style: TextStyle(
-                                      fontFamily: 'Helvetica',
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.white,
-                                      fontSize: 16),
-                                )
-                              : CircularProgressIndicator(),
+                                : null,
+                            child: (isloading == false)
+                                ? Text(
+                                    "Add Role",
+                                    style: TextStyle(
+                                        fontFamily: 'Helvetica',
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.white,
+                                        fontSize: 16),
+                                  )
+                                : CircularProgressIndicator(),
+                          ),
                         ),
                       ),
                     ],
@@ -415,60 +425,6 @@ class _RolesManagementState extends State<RolesManagement> {
         ));
   }
 }
-
-// Widget editRowtext(context, String title, String detail) {
-//   return Column(
-//     mainAxisAlignment: MainAxisAlignment.end,
-//     children: [
-//       Row(
-//         mainAxisAlignment: MainAxisAlignment.center,
-//         children: [
-//           SizedBox(
-//             width: Globals.getDeviceWidth(context) * 0.15,
-//             child: Text(title,
-//                 style: TextStyle(
-//                   fontFamily: 'Helvetica',
-//                   color: Color(0xff676767),
-//                   fontSize: 16,
-//                   fontWeight: FontWeight.w400,
-//                 )),
-//           ),
-//           SizedBox(
-//             width: Globals.getDeviceWidth(context) * 0.35,
-//             child: TextFormField(
-//               initialValue: detail,
-//               keyboardType: TextInputType.text,
-//               validator: (val) {
-//                 if (val!.isEmpty) {
-//                   return "Role is required";
-//                 }
-//                 return val;
-//               },
-//               onChanged: (val) {
-//                 BlocProvider.of<RoleCubit>(context).addRole(val);
-//               },
-//               decoration: InputDecoration(
-//                 border:
-//                     OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-//                 hintText: "Role",
-//                 hintStyle: TextStyle(
-//                   fontFamily: 'Helvetica',
-//                   color: Globals.kFiledColor,
-//                   fontSize: 14,
-//                   fontWeight: FontWeight.w400,
-//                 ),
-//                 // contentPadding: EdgeInsets.all(17),
-//               ),
-//             ),
-//           )
-//         ],
-//       ),
-//       SizedBox(
-//         height: Globals.getDeviceHeight(context) * 0.03,
-//       )
-//     ],
-//   );
-// }
 
 Widget editRowtext(context, String title, Function(String) onChanged,
     String? Function(String?) validator) {

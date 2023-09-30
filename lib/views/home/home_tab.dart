@@ -1,5 +1,5 @@
-import 'package:anjuman_e_najmi/data/model/login_response.dart';
 import 'package:anjuman_e_najmi/data/model/permission.dart';
+import 'package:anjuman_e_najmi/data/model/receipt_model.dart';
 import 'package:anjuman_e_najmi/logic/cubit/authentication/auth_cubit.dart';
 import 'package:anjuman_e_najmi/utils/global_constants.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +21,8 @@ class HomeTab extends StatefulWidget {
 class _HomeTabState extends State<HomeTab> {
   var isloading = false;
   void _loadPaid() async {
+    BlocProvider.of<ReceiptCubit>(context).state.receipt?.clear();
+
     await BlocProvider.of<ReceiptCubit>(context)
         .getpaid(Globals.paid, limit: 4);
     setState(() {
@@ -130,8 +132,6 @@ class _HomeTabState extends State<HomeTab> {
               padding: const EdgeInsets.all(15.0),
               child: BlocBuilder<AuthCubit, AuthState>(
                 builder: (context, state) {
-                  // BlocProvider.of<AuthCubit>(context).getRoleAccess(1);
-                  // print("In home tab: ${state.accesses?[0]}");
                   debugPrint("WWWWW ${state.permission}");
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -156,29 +156,19 @@ class _HomeTabState extends State<HomeTab> {
                         height: Globals.getDeviceHeight(context) * 0.03,
                       ),
 
-                      (isloading == true)
-                          ? (!hasAccess)
-                              ? SizedBox()
-                              : DashboardWidget(
-                                  title: "Receipt",
-                                )
-                          : Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                      //  : SizedBox(),
+                      // (isloading == true)
+                      //     ? (!hasAccess)
+                      //         ? SizedBox()
+                      //         : DashboardWidget(
+                      //             title: "Receipt",
+                      //           )
+                      //     : Center(
+                      //         child: CircularProgressIndicator(),
+                      //       ),
+
                       SizedBox(
                         height: Globals.getDeviceHeight(context) * 0.03,
                       ),
-                      // (state.accesses?[0].childResources?[1].access == "r" ||
-                      //             state.accesses?[0].childResources?[1]
-                      //                     .access ==
-                      //                 "w") &&
-                      //         (state.accesses?[0].access != "n")
-                      // (state.permission == "r" || state.permission == "w") &&
-                      //         (state.permission != "n")
-                      // ?
-                      // DashboardWidget(title: "Budget")
-                      // : SizedBox(),
                     ],
                   );
                 },
@@ -189,97 +179,20 @@ class _HomeTabState extends State<HomeTab> {
       ),
     );
   }
-
-  Widget receiptDialog(context) {
-    return AlertDialog(
-        insetPadding:
-            const EdgeInsets.only(left: 15, right: 15, top: 35, bottom: 35),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        shadowColor: Globals.kTextFieldFilledColor,
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              "Are you sure?",
-              style: TextStyle(
-                  fontFamily: 'Helvetica',
-                  fontWeight: FontWeight.w400,
-                  color: Color(0xff525252),
-                  fontSize: 22),
-            ),
-            Text(
-              "Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat.",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  fontFamily: 'Helvetica',
-                  fontWeight: FontWeight.w400,
-                  color: Color(0xff525252),
-                  fontSize: 16),
-            ),
-            SizedBox(
-              height: Globals.getDeviceHeight(context) * 0.04,
-            ),
-            Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-              DecoratedBox(
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Color(0xff456BD0), width: 1.2),
-                    gradient: LinearGradient(
-                        colors: [Color(0xff233C7E), Color(0xff456BD0)])),
-                child: MaterialButton(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20)),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.pop(context);
-                  },
-                  child: Text(
-                    "Confirm",
-                    style: TextStyle(
-                        fontFamily: 'Helvetica',
-                        fontWeight: FontWeight.w400,
-                        color: Colors.white,
-                        fontSize: 16),
-                  ),
-                ),
-              ),
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Color(0xff456BD0), width: 1.2),
-                ),
-                child: MaterialButton(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20)),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.pop(context);
-                  },
-                  child: Text(
-                    "Cancel",
-                    style: TextStyle(
-                        fontFamily: 'Helvetica',
-                        fontWeight: FontWeight.w400,
-                        color: Globals.kUniversalColor,
-                        fontSize: 16),
-                  ),
-                ),
-              ),
-            ]),
-          ],
-        ));
-  }
 }
 
 class DashboardWidget extends StatelessWidget {
   final String title;
 
   DashboardWidget({required this.title});
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ReceiptCubit, ReceiptState>(builder: (context, state) {
+      int startIndex =
+          (state.receipt?.length ?? -2) < 1 ? 1 : state.receipt?.length ?? -2;
+      List<ReceiptModel>? slicedList = state.receipt?.sublist(1);
+      print(slicedList?.length);
+      print("Sliced");
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -323,92 +236,79 @@ class DashboardWidget extends StatelessWidget {
               itemCount: 2,
               shrinkWrap: true,
               itemBuilder: (ctx, i) {
-                if (i < state.receipt!.length + 1) {
-                  return InkWell(
-                    onTap: () async {
-                      context.read<ReceiptCubit>().resetOffSet();
-                      await showDialog(
-                          context: context,
-                          builder: (BuildContext context) => ViewReceiptUnPaid(
-                                id: state.receipt?[i].id ?? 0,
-                                fullname: state.receipt?[i].fullname,
-                                amount: state.receipt?[i].hubAmount,
-                                receiptdate: state.receipt?[i].createdOn,
-                                receiptCode: state.receipt?[i].receiptCode,
-                                itsNumber: state.receipt?[i].itsNumber,
-                                hubType: state.receipt?[i].hubType,
-                                paymentMode: state.receipt?[i].paymentMode,
-                                isDeposit: state.receipt?[i].isDeposited,
-                                isDeshboard: true,
-                              ));
-                    },
-                    child: Card(
-                      shadowColor: Globals.kUniversalColor,
-                      margin:
-                          const EdgeInsets.only(left: 15, right: 15, top: 15),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                      child: Padding(
-                        padding: EdgeInsets.all(15),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Text(
-                                  // "#1245",
-                                  "#${state.receipt?[i].receiptCode}"
-                                      .toString(),
-                                  style: TextStyle(
-                                      fontFamily: 'Helvetica',
-                                      fontWeight: FontWeight.w400,
-                                      color: Globals.kUniversalColor,
-                                      fontSize: 15),
-                                ),
-                                Spacer(),
-                                Text(
-                                    "Date:${state.receipt?[i].depositDate.toString()
+                return InkWell(
+                  onTap: () async {
+                    context.read<ReceiptCubit>().resetOffSet();
+                    await showDialog(
+                        context: context,
+                        builder: (BuildContext context) => ViewReceiptUnPaid(
+                              index: i,
+                              receipt: state.receipt,
+                              isDeshboard: true,
+                            ));
+                  },
+                  child: Card(
+                    shadowColor: Globals.kUniversalColor,
+                    margin: const EdgeInsets.only(left: 15, right: 15, top: 15),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                    child: Padding(
+                      padding: EdgeInsets.all(15),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                // "#1245",
+                                "#${slicedList?[i].receiptCode}".toString(),
+                                style: TextStyle(
+                                    fontFamily: 'Helvetica',
+                                    fontWeight: FontWeight.w400,
+                                    color: Globals.kUniversalColor,
+                                    fontSize: 15),
+                              ),
+                              Spacer(),
+                              Text(
+                                  "Date:${slicedList?[i].depositDate.toString()
 
-                                    /// convertdate
-                                    }",
-                                    style: TextStyle(
-                                        fontFamily: 'Helvetica',
-                                        fontWeight: FontWeight.w400,
-                                        color: Color(0xff889EC9),
-                                        fontSize: 12)),
-                              ],
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: Text(state.receipt?[i].fullname ?? "",
-                                      style: TextStyle(
-                                          fontFamily: 'Helvetica',
-                                          fontWeight: FontWeight.w400,
-                                          color: Color(0xff858585),
-                                          fontSize: 16)),
-                                ),
-                                Spacer(),
-                                Text(
-                                  "Time:${state.receipt?[i].createdOn.toString()}",
+                                  /// convertdate
+                                  }",
                                   style: TextStyle(
                                       fontFamily: 'Helvetica',
                                       fontWeight: FontWeight.w400,
                                       color: Color(0xff889EC9),
-                                      fontSize: 11),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                                      fontSize: 12)),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Text(slicedList?[i].fullname ?? "",
+                                    style: TextStyle(
+                                        fontFamily: 'Helvetica',
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xff858585),
+                                        fontSize: 16)),
+                              ),
+                              Spacer(),
+                              Text(
+                                "Time:${slicedList?[i].createdOn.toString()}",
+                                style: TextStyle(
+                                    fontFamily: 'Helvetica',
+                                    fontWeight: FontWeight.w400,
+                                    color: Color(0xff889EC9),
+                                    fontSize: 11),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                  );
-                } else {
-                  return Center(child: Text("Please wait data is Loading...."));
-                }
+                  ),
+                );
               }),
         ],
       );

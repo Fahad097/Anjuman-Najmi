@@ -86,8 +86,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
             //     ),
             Tab(icon: ImageIcon(AssetImage(AssetConfig.kReceiptTab))),
             // Tab(icon: ImageIcon(AssetImage(BlocProvider.of<ReceiptCubit>(context).state.isCheck!? AssetConfig.kmoreHorizontleIcon : AssetConfig.kreadwrite_Icon)),),
-            BlocProvider.of<ReceiptCubit>(context).state.isCheck == false
-                //  authCub.state.permission == "w"
+            hasAccessRole || hasAccessUser
                 ? Tab(
                     child: PopupMenuButton<String>(
                       padding: EdgeInsets.all(5),

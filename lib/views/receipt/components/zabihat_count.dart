@@ -12,6 +12,7 @@ class ZabihatCount extends StatelessWidget {
       builder: (context, state) {
         return TextFormField(
             initialValue: isZabihat.toString(),
+            keyboardType: TextInputType.number,
             autovalidateMode: AutovalidateMode.onUserInteraction,
             style: TextStyle(
               fontFamily: 'Helvetica',
@@ -25,15 +26,10 @@ class ZabihatCount extends StatelessWidget {
                 return 'Zabihat Count is required';
               }
               if (value.trim().length > 15) {
-                return 'Dont Exceed the text Limit';
+                return 'Zabihat Count should be 15 digits or less';
               }
               return null;
             },
-            // onChanged: (value) => value.isNotEmpty &&
-            //         value != '' &&
-            //         value.trim().length <= 15
-            //     ? context.read<ReceiptCubit>().zabihatCount(int.parse(value))
-            //     : print("$value"),
             onChanged: (newValue) {
               int count =
                   int.tryParse(newValue) ?? 0; // Parse the input as an integer

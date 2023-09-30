@@ -41,6 +41,12 @@ class ReceiptRepository {
     return result;
   }
 
+  Future getPDF(int id) async {
+    final result = await provider.getPDF(id);
+    debugPrint("Repository ${result.toString()}");
+    return result;
+  }
+
   Future deleteReceipt(int id) async {
     final result = await provider.deleteReceipt(id);
     debugPrint("Repository ${result.toString()}");

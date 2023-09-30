@@ -19,6 +19,7 @@ class ApiUrls {
   static String getreceiptid = "${baseUrl}receipt/";
   static String getreceiptunpaid =
       "${baseUrl}receipt?type=paid&limit=10&offset=0}";
+  static String getReceiptPDF = "${baseUrl}receipt/print/";
   //  http://34.239.93.196/api/receipt?type=paid&limit=10&offset=0
   static String getreceiptpaid = "${baseUrl}receipt";
   static String getreceiptallpaid =

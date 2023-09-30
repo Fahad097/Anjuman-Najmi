@@ -63,7 +63,7 @@ class SignUp extends StatelessWidget {
                           width: Globals.getDeviceWidth(context),
                           height: isLandscape(context)
                               ? Globals.getDeviceHeight(context) * 1.0
-                              : Globals.getDeviceHeight(context) * 0.68,
+                              : Globals.getDeviceHeight(context) * 0.76,
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(20),
                               color: Colors.white),
@@ -246,30 +246,21 @@ class SignUp extends StatelessWidget {
                                               BorderRadius.circular(10)),
                                       minWidth: double.infinity,
                                       onPressed: () {
-                                        // BlocProvider.of<AuthCubit>(context)
-                                        //     .startTimer();
-                                        // showDialog(
-                                        //     context: context,
-                                        //     builder: (BuildContext context) =>
-                                        //         VerificationDialog());
-
                                         if (formKey.currentState!.validate()) {
                                           BlocProvider.of<AuthCubit>(context)
                                               .signup(context);
-                                          // Navigator.pushNamedAndRemoveUntil(
-                                          //     context,
-                                          //     botttomnav,
-                                          //     (route) => false);
                                         }
                                       },
-                                      child: Text(
-                                        "Sign up",
-                                        style: TextStyle(
-                                            fontFamily: 'Helvetica',
-                                            fontWeight: FontWeight.w400,
-                                            color: Colors.white,
-                                            fontSize: 16),
-                                      ),
+                                      child: (state.isloading!)
+                                          ? CircularProgressIndicator()
+                                          : Text(
+                                              "Sign up",
+                                              style: TextStyle(
+                                                  fontFamily: 'Helvetica',
+                                                  fontWeight: FontWeight.w400,
+                                                  color: Colors.white,
+                                                  fontSize: 16),
+                                            ),
                                     ),
                                   ),
                                 ]),

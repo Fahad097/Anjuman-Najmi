@@ -15,7 +15,6 @@ class _PaidState extends State<Paid> {
   bool isLoading = false;
   refres() async {
     BlocProvider.of<ReceiptCubit>(context).getpaid(limit: 4, Globals.paid);
-    // BlocProvider.of<ReceiptCubit>(context).getReceiptAllPaid();
     setState(() {
       isLoading = false;
     });
@@ -27,8 +26,10 @@ class _PaidState extends State<Paid> {
   @override
   void initState() {
     super.initState();
+    context.read<ReceiptCubit>().resetOffSet();
+    context.read<ReceiptCubit>().state.receipt!.clear();
     scrollController.addListener(pagination);
-    BlocProvider.of<ReceiptCubit>(context).getpaid(Globals.unpaid, limit: 4);
+    BlocProvider.of<ReceiptCubit>(context).getpaid(Globals.paid, limit: 4);
   }
 
   @override
@@ -46,13 +47,7 @@ class _PaidState extends State<Paid> {
       });
 
       await BlocProvider.of<ReceiptCubit>(context).updateOffSet();
-      BlocProvider.of<ReceiptCubit>(context).getpaid(Globals.unpaid, limit: 4);
-
-      // setState(() {
-      //   isLoading = false;
-      //   // Check if there's more data to load.
-      //   hasMoreData = // Add your condition to check if there's more data.
-      // });
+      BlocProvider.of<ReceiptCubit>(context).getpaid(Globals.paid, limit: 4);
     }
   }
 
@@ -61,8 +56,9 @@ class _PaidState extends State<Paid> {
       builder: (context, state) {
         if (state.receipt!.isNotEmpty) {
           return ListView.builder(
-              itemCount: state.receipt!.length + 1,
+              itemCount: state.receipt?.length ?? 0,
               shrinkWrap: true,
+              controller: scrollController,
               itemBuilder: (ctx, index) {
                 if (index < state.receipt!.length) {
                   return InkWell(
@@ -70,15 +66,9 @@ class _PaidState extends State<Paid> {
                       showDialog(
                           context: context,
                           builder: (BuildContext context) => ViewReceiptPaid(
-                              id: state.receipt?[index].id ?? 0,
-                              fullname: state.receipt?[index].fullname,
-                              amount: state.receipt?[index].hubAmount,
-                              receiptdate: state.receipt?[index].createdOn,
-                              receiptCode: state.receipt?[index].receiptCode,
-                              itsNumber: state.receipt?[index].itsNumber,
-                              hubType: state.receipt?[index].hubType,
-                              paymentMode: state.receipt?[index].paymentMode,
-                              isDeposit: state.receipt?[index].isDeposited));
+                              index: index,
+                              receipt: state.receipt,
+                              isDeshboard: false));
                     },
                     child: Card(
                       shadowColor: Globals.kUniversalColor,
@@ -141,27 +131,6 @@ class _PaidState extends State<Paid> {
                       ),
                     ),
                   );
-                } else {
-                  if (state.isCheck!) {
-                    return Center(
-                      widthFactor: 10,
-                      heightFactor: 10,
-                      child: Center(
-                        child: CircularProgressIndicator(
-                            color: Globals.kUniversalColor),
-                      ),
-                    );
-                  } else {
-                    return SizedBox(
-                      height: 10,
-                      width: 10,
-                      child: Center(
-                        child: Text(
-                          "No More Receipts",
-                        ),
-                      ),
-                    );
-                  }
                 }
               });
         } else {

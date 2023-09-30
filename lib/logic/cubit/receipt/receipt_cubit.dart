@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:anjuman_e_najmi/data/model/Receipt_url_pdf.dart';
 import 'package:anjuman_e_najmi/data/model/its_response.dart';
 import 'package:anjuman_e_najmi/data/model/payment_response.dart';
 import 'package:anjuman_e_najmi/data/model/receipt_response.dart';
@@ -72,22 +73,11 @@ class ReceiptCubit extends Cubit<ReceiptState> {
   }
 
   amount(String amount) {
-    double parsedDouble = double.parse(amount); // Parse the string as a double
-    int decimalPlaces = 2; // Specify the desired number of decimal places
+    var formattedStringSplit;
+    formattedStringSplit = amount.split('.');
+    var formattedString = formattedStringSplit[0];
 
-// Round the double to the desired number of decimal places
-    double roundedDouble =
-        double.parse(parsedDouble.toStringAsFixed(decimalPlaces));
-
-// Convert the rounded double back to a string
-    String formattedString = roundedDouble.toString();
-
-    print(formattedString);
     emit(state.copywith(aamount: formattedString));
-  }
-
-  mohallah(String m) {
-    emit(state.copywith(mmohallah: m));
   }
 
   Future<void> selectDate(BuildContext context) async {
@@ -110,11 +100,8 @@ class ReceiptCubit extends Cubit<ReceiptState> {
     await receiptRepository.lastReceiptNumber().then((value) {
       final response = ReceiptResponse.fromJson(value);
       if (response.statusCode != null &&
-              response.statusCode == 200 &&
-              response.receiptModel?.receiptNumber != null
-          // response.receiptModel?.receiptNumber
-          // !=response.receiptModel?.receiptNumber
-          ) {
+          response.statusCode == 200 &&
+          response.receiptModel?.receiptNumber != null) {
         int lastnumber = response.receiptModel?.receiptNumber ?? 0;
         emit(state.copywith(
             rreceiptNumber: lastnumber,
@@ -123,11 +110,12 @@ class ReceiptCubit extends Cubit<ReceiptState> {
     });
   }
 
-  static int? itsNumb;
   ItsResponse itsList = ItsResponse();
   itsnumber(context, int id) async {
     await receiptRepository.itsNumber(id).then((value) {
       final response = ItsResponse.fromJson(value);
+      int s = response.statusCode ?? 0;
+      print("TTT$s}");
       if (response.statusCode != null &&
           response.statusCode == 200 &&
           id != 0) {
@@ -137,9 +125,28 @@ class ReceiptCubit extends Cubit<ReceiptState> {
             mmohallaId: response.data?.mohallahId,
             iitsNumber: state.itsNumber,
             nname: response.data?.name,
+            iitsStatuscode: s,
             mmohallah: response.data?.mohallahName,
             iimageUrl: response.data?.imageUrl));
       }
+    });
+  }
+
+  getReceiptURL(int id) async {
+    print('in');
+    emit(state.copywith(iisloading: true));
+    await receiptRepository.getPDF(id).then((value) {
+      final response = ReceiptPdf.fromJson(value);
+      print("Result  getpdf: $response");
+      if (response.statusCode != null && response.statusCode == 200) {
+        print("${response.data!.url}");
+
+        emit(
+            state.copywith(rreceiptPDF: response.data!.url, iisloading: false));
+      }
+    }).onError((error, stackTrace) {
+      Globals.showToast('There is issue with url');
+      emit(state.copywith(iisloading: false));
     });
   }
 
@@ -215,6 +222,7 @@ class ReceiptCubit extends Cubit<ReceiptState> {
         emit(state.copywith(
             hhubtypelist: hubtypelist,
             //  hhubtypeId: response.hubModel?[i].id,
+
             zzabihatCount: response.hubModel?[i].isZabihat));
         log("GGGGGG ${state.hubtypelist?[index].id} ${response.hubModel?[i].isZabihat}");
       }
@@ -255,27 +263,22 @@ class ReceiptCubit extends Cubit<ReceiptState> {
 
   editReceipts(context, int id) async {
     final authCub = BlocProvider.of<AuthCubit>(context, listen: false);
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => Center(
-            child: CircularProgressIndicator(color: Globals.kUniversal)));
-
+    print(
+        "www  ${state.itsNumber} ${state.name}${state.amount} ${state.dateController?.text.toString()} ${state.hubType}${state.paymentMode} ${state.mohallaId} ${authCub.getuserID}  ${state.markazId} ${state.zabihatCount} ${state.isDeposit}");
     Map<String, dynamic> variable = {
       "receipt_number": state.receiptCode,
       "its_number": state.itsNumber,
       "fullname": state.name,
       "hub_amount": state.amount,
-      "hub_date": state.dateController?.text,
+      "hub_date": state.dateController?.text.toString(),
       "hub_type": state.hubType,
-      "user_id": authCub.getuserID,
       "payment_mode": state.paymentMode,
       "mohalla_id": state.mohallaId,
+      "user_id": authCub.getuserID,
       "markaz_id": state.markazId,
-      //"zabihat_count": state.hubtypelist?[i].isZabihat,
       "zabihat_count": state.zabihatCount,
-      "is_deposited": state.isDeposit
     };
+    emit(state.copywith(iisloading: true));
     await receiptRepository
         .editReceipt(
       id,
@@ -292,60 +295,49 @@ class ReceiptCubit extends Cubit<ReceiptState> {
         log("Result: $value   date $controller");
 
         emit(state.copywith(
-            rreceiptCode: response.receiptModel?.receiptCode,
-            iitsNumber: response.receiptModel?.itsNumber,
             aamount: response.receiptModel?.hubAmount,
-            iid: response.receiptModel?.id,
             zzabihatCount: response.receiptModel?.zabihatCount,
-            iisDeposit: response.receiptModel?.isDeposited,
+            iitsNumber: response.receiptModel?.itsNumber,
+            rreceiptCode: response.receiptModel?.receiptCode,
             mmarkazId: response.receiptModel?.markazId,
             mmohallaId: response.receiptModel?.mohallaId,
-            ddateController: controller));
+            ddateController: controller,
+            iisloading: false));
+        Globals.showToast("Receipt is Edit");
+        getpaid(Globals.unpaid == "unpaid" ? Globals.unpaid : Globals.paid,
+            limit: 20);
       }
+    }).onError((error, stackTrace) {
+      Globals.showToast("Invalid ITS Number");
+
+      emit(state.copywith(iisloading: false));
     });
-    Navigator.pop(context);
-    Navigator.pop(context);
   }
 
-  // getReceiptpaid({int limit = 10, int offset = 0}) async {
-  //   Map<String, dynamic> variable = {'limit': limit, 'offset': state.offset};
-  //   await receiptRepository.getReceiptpaid(variable).then((value) {
-  //     final response = ReceiptResponse.fromJson(value);
-  //     log("Result  getReceiptpaid: $response");
-  //     if (response.receiptModel != null) {
-  //       if (response.statusCode != null && response.statusCode == 200) {
-  //         receiptList.clear();
-  //         receiptList.add(response.receiptModel!);
-
-  //         emit(state.copywith(rreceipt: receiptList));
-  //       }
-  //     }
-  //   });
-  // }
   int i = 0;
-  markpaid(context, int id) async {
+  markpaid(context, List<ReceiptModel> receipt, int index) async {
     final authCub = BlocProvider.of<AuthCubit>(context, listen: false);
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => Center(
-            child: CircularProgressIndicator(color: Globals.kUniversal)));
+    print(
+        "www  ${receipt[index].receiptCode} ${receipt[index].itsNumber} ${receipt[index].hubAmount} ${receipt[index].createdOn} ${receipt[index].markazId} ${receipt[index].hubType} ${receipt[index].paymentMode} ${receipt[index].fullname}  ${receipt[index].markazId}  ${receipt[index].zabihatCount} ${receipt[index].createdBy}");
 
     Map<String, dynamic> variable = {
-      "receipt_number": state.receiptCode,
-      "its_number": state.itsNumber,
-      "hub_amount": state.amount,
-      "hub_date": state.dateController?.text.toString(),
-      "hub_type": state.hubType,
-      "payment_mode": state.paymentMode,
-      "fullname": state.name,
-      "mohalla_id": state.mohallaId,
+      "receipt_number": receipt[index].receiptCode,
+      "its_number": receipt[index].itsNumber,
+      "hub_amount": receipt[index].hubAmount,
+      "hub_date": receipt[index].createdOn,
+      "hub_type": receipt[index].hubType,
+      "payment_mode": receipt[index].paymentMode,
+      "fullname": receipt[index].fullname,
+      "mohalla_id": receipt[index].mohallaId,
       "user_id": authCub.getuserID,
-      "markaz_id": state.markazId,
-      "zabihat_count": state.zabihatCount,
+      "markaz_id": receipt[index].markazId,
+      "zabihat_count": receipt[index].zabihatCount,
       "is_deposited": 1
     };
-    await receiptRepository.editReceipt(id, variable).then((value) {
+    emit(state.copywith(iisloading: true));
+    await receiptRepository
+        .editReceipt(receipt[index].id ?? 0, variable)
+        .then((value) {
       final response = ReceiptResponse.fromJson(value);
 
       log("Result: $response");
@@ -363,34 +355,37 @@ class ReceiptCubit extends Cubit<ReceiptState> {
             rreceiptCode: response.receiptModel?.receiptCode,
             mmarkazId: response.receiptModel?.markazId,
             mmohallaId: response.receiptModel?.mohallaId,
+            iisloading: false,
             ddateController: controller));
       }
+      Globals.showToast("Receipt is Paid");
+    }).onError((error, stackTrace) {
+      Globals.showToast("Receipt Not Paid");
+      emit(state.copywith(iisloading: true));
     });
   }
 
-  markUnpaid(context, int id) async {
+  markUnpaid(context, List<ReceiptModel> receipt, int index) async {
     final authCub = BlocProvider.of<AuthCubit>(context, listen: false);
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => Center(
-            child: CircularProgressIndicator(color: Globals.kUniversal)));
 
     Map<String, dynamic> variable = {
-      "receipt_number": state.receiptCode,
-      "its_number": state.itsNumber,
-      "hub_amount": state.amount,
-      "hub_date": state.dateController?.text.toString(),
-      "hub_type": state.hubType,
-      "payment_mode": state.paymentMode,
-      "fullname": state.name,
-      "mohalla_id": state.mohallaId,
+      "receipt_number": receipt[index].receiptCode,
+      "its_number": receipt[index].itsNumber,
+      "hub_amount": receipt[index].hubAmount,
+      "hub_date": receipt[index].createdOn,
+      "hub_type": receipt[index].hubType,
+      "payment_mode": receipt[index].paymentMode,
+      "fullname": receipt[index].fullname,
+      "mohalla_id": receipt[index].mohallaId,
       "user_id": authCub.getuserID,
-      "markaz_id": state.markazId,
-      "zabihat_count": state.zabihatCount,
+      "markaz_id": receipt[index].markazId,
+      "zabihat_count": receipt[index].zabihatCount,
       "is_deposited": 0
     };
-    await receiptRepository.editReceipt(id, variable).then((value) {
+    emit(state.copywith(iisloading: true));
+    await receiptRepository
+        .editReceipt(receipt[index].id ?? 0, variable)
+        .then((value) {
       final response = ReceiptResponse.fromJson(value);
 
       log("Result: $response");
@@ -408,8 +403,13 @@ class ReceiptCubit extends Cubit<ReceiptState> {
             rreceiptCode: response.receiptModel?.receiptCode,
             mmarkazId: response.receiptModel?.markazId,
             mmohallaId: response.receiptModel?.mohallaId,
+            iisloading: false,
             ddateController: controller));
       }
+      Globals.showToast("Receipt is Unpaid");
+    }).onError((error, stackTrace) {
+      Globals.showToast("Receipt Not Unpaid");
+      emit(state.copywith(iisloading: false));
     });
   }
 
@@ -432,43 +432,28 @@ class ReceiptCubit extends Cubit<ReceiptState> {
       if (response.statusCode != null &&
           response.statusCode == 200 &&
           dd != null) {
-        //   newreceiptList.clear();
-        // if (!state.oldReceiptList!.any((element) => element.id == dd[i].id)) {
-        //   newreceiptList.add(ReceiptModel(
-        //     id: dd[i].id,
-        //     receiptCode: dd[i].receiptCode,
-        //     fullname: dd[i].fullname,
-        //     createdBy: dd[i].createdBy,
-        //     createdOn: dd[i].createdOn,
-        //   ));
-        // }
-
-        // for (i; i < dd!.length; i++) {
-        //   newreceiptList.add(ReceiptModel(
-        //     id: dd[i].id,
-        //     receiptNumber: dd[i].receiptNumber,
-        //     receiptCode: dd[i].receiptCode,
-        //     itsNumber: dd[i].itsNumber,
-        //     fullname: dd[i].fullname,
-        //     hubAmount: dd[i].hubAmount,
-        //     hubDate: dd[i].hubDate,
-        //     mohallaId: dd[i].mohallaId,
-        //     hubType: dd[i].hubType,
-        //     zabihatCount: dd[i].zabihatCount,
-        //     markazId: dd[i].markazId,
-        //     isDeposited: dd[i].isDeposited,
-        //     depositDate: dd[i].depositDate,
-        //     paymentMode: dd[i].paymentMode,
-        //     createdBy: dd[i].createdBy,
-        //     createdOn: dd[i].createdOn,
-        //   ));
-
         newreceiptList = dd.map((item) {
           return ReceiptModel(
+            id: item.id,
+            receiptNumber: item.receiptNumber,
             receiptCode: item.receiptCode,
+            itsNumber: item.itsNumber,
             fullname: item.fullname,
+            hubAmount: item.hubAmount,
+            hubDate: item.hubDate,
+            mohallaId: item.mohallaId,
+            hubType: item.hubType,
+            zabihatCount: item.zabihatCount,
+            markazId: item.markazId,
+            isDeposited: item.isDeposited,
+            depositDate: item.depositDate,
             createdBy: item.createdBy,
             createdOn: item.createdOn,
+            isDeleted: item.isDeleted,
+            paymentMode: item.paymentMode,
+            mohallahName: item.mohallahName,
+            hubTypeName: item.hubTypeName,
+            paymentTitle: item.paymentTitle,
           );
         }).toList();
 
@@ -490,18 +475,14 @@ class ReceiptCubit extends Cubit<ReceiptState> {
 
   resetOffSet() {
     emit(state.copywith(ooffset: 0));
+    debugPrint(" offset: ${state.offset}");
   }
 
   addReceipts(
     context,
   ) async {
     final authCub = BlocProvider.of<AuthCubit>(context, listen: false);
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => Center(
-            child: CircularProgressIndicator(color: Globals.kUniversal)));
-
+    emit(state.copywith(iisloading: true));
     Map<String, dynamic> variable = {
       "receipt_number": state.receiptCode,
       "its_number": state.itsNumber,
@@ -513,18 +494,16 @@ class ReceiptCubit extends Cubit<ReceiptState> {
       "mohalla_id": state.mohallaId,
       "user_id": authCub.getuserID,
       "markaz_id": state.markazId,
-      //"zabihat_count": state.hubtypelist?[i].isZabihat,
       "zabihat_count": state.zabihatCount,
       "is_deposited": state.isDeposit
     };
-    {}
-
     await receiptRepository.addReceipt(variable).then((value) {
       final response = ReceiptResponse.fromJson(value);
       if (response.statusCode != null && response.statusCode == 200) {
         TextEditingController controller = TextEditingController.fromValue(
           TextEditingValue(text: "${response.receiptModel?.depositDate}"),
         );
+        print("${controller.toString()}");
         emit(state.copywith(
             aamount: response.receiptModel?.hubAmount,
             zzabihatCount: response.receiptModel?.zabihatCount,
@@ -533,12 +512,17 @@ class ReceiptCubit extends Cubit<ReceiptState> {
             mmarkazId: response.receiptModel?.markazId,
             mmohallaId: response.receiptModel?.mohallaId,
             iisDeposit: response.receiptModel?.isDeposited,
-            ddateController: controller));
+            ddateController: controller,
+            iisloading: false));
+        Globals.showToast("Receipt is Created");
+
+        resetReceipt();
       }
+    }).onError((error, stackTrace) {
+      Globals.showToast("Invalid ITS Number");
+
+      emit(state.copywith(iisloading: false));
     });
-    Globals.showToast("Receipt is Created");
-    Navigator.pop(context);
-    resetReceipt();
   }
 
   resetReceipt() {

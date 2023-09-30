@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:anjuman_e_najmi/logic/cubit/authentication/auth_cubit.dart';
 import 'package:anjuman_e_najmi/logic/cubit/role/role_state.dart';
 import 'package:anjuman_e_najmi/routes/routes_names.dart';
@@ -24,27 +23,36 @@ class EditProfile extends StatefulWidget {
 final GlobalKey<FormState> editKey = GlobalKey<FormState>();
 
 class _EditProfileState extends State<EditProfile> {
-  ImagePicker _picker = ImagePicker();
-
-  //File? image;
-  @override
-  void initState() {
+  bool isloading = false;
+  _loadData() async {
+    BlocProvider.of<AuthCubit>(context).state.password = '';
     widget.btncheck == "GetUserEdit"
-        ? BlocProvider.of<RoleCubit>(context).getUserRole(context)
+        ? await BlocProvider.of<RoleCubit>(context).getUserRole(context)
         : SizedBox();
+
     if (widget.btncheck == "GetUserEdit") {
-      BlocProvider.of<AuthCubit>(context)
+      await BlocProvider.of<AuthCubit>(context)
           .updateemail(widget.userModel?.email ?? "");
-      BlocProvider.of<AuthCubit>(context)
+      await BlocProvider.of<AuthCubit>(context)
           .updatefullName(widget.userModel?.fullname ?? "");
-      BlocProvider.of<AuthCubit>(context)
+      await BlocProvider.of<AuthCubit>(context)
           .updateusername(widget.userModel?.username ?? "");
-      BlocProvider.of<AuthCubit>(context)
+      await BlocProvider.of<AuthCubit>(context)
           .updateroleId(widget.userModel?.roleId ?? 0);
-      BlocProvider.of<AuthCubit>(context)
-          .updatepassword(widget.userModel?.password ?? "");
+      BlocProvider.of<AuthCubit>(context).state.updatepassword = '';
     }
 
+    setState(() {
+      isloading = true;
+    });
+  }
+
+  @override
+  void initState() {
+    _loadData();
+    BlocProvider.of<AuthCubit>(context)
+        .password(BlocProvider.of<AuthCubit>(context).getUserPassword);
+    print(BlocProvider.of<AuthCubit>(context).getUserPassword);
     super.initState();
   }
 
@@ -164,168 +172,266 @@ class _EditProfileState extends State<EditProfile> {
                                         Globals.getDeviceHeight(context) * 0.03,
                                   ),
                                   Container(
-                                    padding: EdgeInsets.all(20),
-                                    width: Globals.getDeviceWidth(context),
-                                    height: isLandscape(context)
-                                        ? Globals.getDeviceHeight(context) * 1.0
-                                        : Globals.getDeviceHeight(context) *
-                                            0.68,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(20),
-                                        color: Colors.white),
-                                    child: Form(
-                                      key: editKey,
-                                      child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            //  imageProfile(context, state),
-                                            SizedBox(
-                                              height: Globals.getDeviceHeight(
-                                                      context) *
-                                                  0.05,
-                                            ),
-                                            editRowtext(
-                                                context,
-                                                "Name:",
-                                                Globals.isTextNullOrEmptyString(
-                                                    widget.userModel?.fullname),
-                                                (value) => context
-                                                    .read<AuthCubit>()
-                                                    .updatefullName(value),
-                                                (value) {
-                                              if (value == null ||
-                                                  value.trim().isEmpty) {
-                                                return 'Name is required';
-                                              }
-                                              if (value.trim().length > 30) {
-                                                return 'Dont Exceed the text Limit';
-                                              }
-                                              return null;
-                                            }
-                                                // "Marcel"
+                                      padding: EdgeInsets.all(20),
+                                      width: Globals.getDeviceWidth(context),
+                                      height: isLandscape(context)
+                                          ? Globals.getDeviceHeight(context) *
+                                              1.0
+                                          : Globals.getDeviceHeight(context) *
+                                              0.75,
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          color: Colors.white),
+                                      child: (isloading == false)
+                                          ? Center(
+                                              child:
+                                                  CircularProgressIndicator(),
+                                            )
+                                          : Form(
+                                              key: editKey,
+                                              child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    SizedBox(
+                                                      height: Globals
+                                                              .getDeviceHeight(
+                                                                  context) *
+                                                          0.05,
+                                                    ),
+                                                    editRowtext(
+                                                        context,
+                                                        "Name:",
+                                                        Globals
+                                                            .isTextNullOrEmptyString(
+                                                                widget.userModel
+                                                                    ?.fullname),
+                                                        (value) => context
+                                                            .read<AuthCubit>()
+                                                            .updatefullName(
+                                                                value),
+                                                        (value) {
+                                                      if (value == null ||
+                                                          value
+                                                              .trim()
+                                                              .isEmpty) {
+                                                        return 'Name is required';
+                                                      }
+                                                      if (value.trim().length >
+                                                          30) {
+                                                        return 'Dont Exceed the text Limit';
+                                                      }
+                                                      return null;
+                                                    }
+                                                        // "Marcel"
 
-                                                ),
-                                            editRowtext(
-                                                context,
-                                                "Username:",
-                                                Globals.isTextNullOrEmptyString(
-                                                    widget.userModel
-                                                            ?.username ??
-                                                        ""),
-                                                (value) => value.isNotEmpty &&
-                                                        value != "" &&
-                                                        value.trim().length <=
-                                                            25
-                                                    ? context
-                                                        .read<AuthCubit>()
-                                                        .updateusername(value)
-                                                    : print("$value"),
-                                                //"John Deo"
-                                                (value) {
-                                              if (value == null ||
-                                                  value.trim().isEmpty) {
-                                                return 'UserName is required';
-                                              }
-                                              if (value.trim().length > 25) {
-                                                return 'Dont Exceed the text Limit';
-                                              }
-                                              return null;
-                                            }),
-                                            editRowtext(
-                                                context,
-                                                "Email:",
-                                                Globals.isTextNullOrEmptyString(
-                                                    widget.userModel?.email ??
-                                                        ""),
-                                                (value) => value.isNotEmpty &&
-                                                        value != "" &&
-                                                        value.trim().length <=
-                                                            35
-                                                    ? context
-                                                        .read<AuthCubit>()
-                                                        .updateusername(value)
-                                                    : print("$value")
-                                                // "marcel23@gmail.com",
-                                                , (value) {
-                                              if (value == null ||
-                                                  value.trim().isEmpty) {
-                                                return 'Email is required';
-                                              }
-                                              if (value.trim().length > 35) {
-                                                return 'Dont Exceed the text Limit';
-                                              }
-                                              return null;
-                                            }),
-                                            editRowtext(
-                                                context,
-                                                "Password:",
-                                                "",
-                                                (value) => value.isNotEmpty &&
-                                                        value != "" &&
-                                                        value.trim().length <= 8
-                                                    ? context
-                                                        .read<AuthCubit>()
-                                                        .updatepassword(value)
-                                                    : print("$value"), (value) {
-                                              if (value == null ||
-                                                  value.trim().isEmpty) {
-                                                return 'Password is required';
-                                              }
-                                              if (value.trim().length > 8) {
-                                                return 'Dont Exceed the text Limit';
-                                              }
-                                              return null;
-                                            }),
-                                            editRowDropDown(context, "Role",
-                                                widget.userModel?.roleId ?? 0),
-                                            SizedBox(
-                                              height: Globals.getDeviceHeight(
-                                                      context) *
-                                                  0.03,
-                                            ),
-                                            DecoratedBox(
-                                              decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  gradient: LinearGradient(
-                                                      colors: [
-                                                        Color(0xff233C7E),
-                                                        Color(0xff456BD0)
-                                                      ])),
-                                              child: MaterialButton(
-                                                height: 50,
-                                                shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10)),
-                                                minWidth: double.infinity,
-                                                onPressed: () async {
-                                                  if (editKey.currentState!
-                                                      .validate()) {
-                                                    await context
-                                                        .read<AuthCubit>()
-                                                        .editUserProfile(
-                                                            context,
+                                                        ),
+                                                    editRowtext(
+                                                        context,
+                                                        "Username:",
+                                                        Globals.isTextNullOrEmptyString(
                                                             widget.userModel
-                                                                    ?.id ??
-                                                                0);
-                                                  }
-                                                },
-                                                child: Text(
-                                                  "UpdateUser",
-                                                  style: TextStyle(
-                                                      fontFamily: 'Helvetica',
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                      color: Colors.white,
-                                                      fontSize: 16),
-                                                ),
-                                              ),
-                                            ),
-                                          ]),
-                                    ),
-                                  )
+                                                                    ?.username ??
+                                                                ""),
+                                                        (value) => value
+                                                                    .isNotEmpty &&
+                                                                value != "" &&
+                                                                value
+                                                                        .trim()
+                                                                        .length <=
+                                                                    25
+                                                            ? context
+                                                                .read<
+                                                                    AuthCubit>()
+                                                                .updateusername(
+                                                                    value)
+                                                            : print("$value"),
+                                                        //"John Deo"
+                                                        (value) {
+                                                      if (value == null ||
+                                                          value
+                                                              .trim()
+                                                              .isEmpty) {
+                                                        return 'UserName is required';
+                                                      }
+                                                      if (value.trim().length >
+                                                          25) {
+                                                        return 'Dont Exceed the text Limit';
+                                                      }
+                                                      return null;
+                                                    }),
+                                                    editRowtext(
+                                                        context,
+                                                        "Email:",
+                                                        Globals
+                                                            .isTextNullOrEmptyString(
+                                                                widget.userModel
+                                                                        ?.email ??
+                                                                    ""),
+                                                        (value) => value
+                                                                    .isNotEmpty &&
+                                                                value != "" &&
+                                                                value
+                                                                        .trim()
+                                                                        .length <=
+                                                                    35
+                                                            ? context
+                                                                .read<
+                                                                    AuthCubit>()
+                                                                .updateusername(
+                                                                    value)
+                                                            : print("$value")
+                                                        // "marcel23@gmail.com",
+                                                        , (value) {
+                                                      if (value == null ||
+                                                          value
+                                                              .trim()
+                                                              .isEmpty) {
+                                                        return 'Email is required';
+                                                      }
+                                                      if (value.trim().length >
+                                                          35) {
+                                                        return 'Dont Exceed the text Limit';
+                                                      }
+                                                      return null;
+                                                    }),
+                                                    Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .end,
+                                                        children: [
+                                                          Row(
+                                                            children: [
+                                                              SizedBox(
+                                                                width: Globals
+                                                                        .getDeviceWidth(
+                                                                            context) *
+                                                                    0.3,
+                                                                child: Text(
+                                                                    "Password: ",
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontFamily:
+                                                                          'Helvetica',
+                                                                      color: Color(
+                                                                          0xff676767),
+                                                                      fontSize:
+                                                                          16,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w400,
+                                                                    )),
+                                                              ),
+                                                              SizedBox(
+                                                                width: Globals
+                                                                        .getDeviceWidth(
+                                                                            context) *
+                                                                    0.45,
+                                                                child: TextFormField(
+                                                                    textAlignVertical: TextAlignVertical.top,
+                                                                    decoration: InputDecoration(
+                                                                        //  contentPadding: EdgeInsets.only(bottom: 0),
+                                                                        isDense: true,
+                                                                        alignLabelWithHint: true),
+                                                                    onChanged: (value) {
+                                                                      context
+                                                                          .read<
+                                                                              AuthCubit>()
+                                                                          .updatepassword(
+                                                                              value);
+                                                                    },
+                                                                    style: TextStyle(
+                                                                      fontFamily:
+                                                                          'Helvetica',
+                                                                      color: Globals
+                                                                          .kUniversalColor,
+                                                                      fontSize:
+                                                                          16,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w400,
+                                                                    )),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          SizedBox(
+                                                            height: Globals
+                                                                    .getDeviceHeight(
+                                                                        context) *
+                                                                0.03,
+                                                          ),
+                                                          editRowDropDown(
+                                                              context,
+                                                              "Role",
+                                                              widget.userModel
+                                                                      ?.roleId ??
+                                                                  0),
+                                                          SizedBox(
+                                                            height: Globals
+                                                                    .getDeviceHeight(
+                                                                        context) *
+                                                                0.03,
+                                                          ),
+                                                          DecoratedBox(
+                                                            decoration: BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            10),
+                                                                gradient:
+                                                                    LinearGradient(
+                                                                        colors: [
+                                                                      Color(
+                                                                          0xff233C7E),
+                                                                      Color(
+                                                                          0xff456BD0)
+                                                                    ])),
+                                                            child:
+                                                                MaterialButton(
+                                                              height: 50,
+                                                              shape: RoundedRectangleBorder(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              10)),
+                                                              minWidth: double
+                                                                  .infinity,
+                                                              onPressed:
+                                                                  () async {
+                                                                if (editKey
+                                                                    .currentState!
+                                                                    .validate()) {
+                                                                  await context
+                                                                      .read<
+                                                                          AuthCubit>()
+                                                                      .editUserProfile(
+                                                                          context,
+                                                                          widget.userModel?.id ??
+                                                                              0);
+                                                                }
+                                                              },
+                                                              child: (state
+                                                                          .isloading ??
+                                                                      false)
+                                                                  ? CircularProgressIndicator()
+                                                                  : Text(
+                                                                      "UpdateUser",
+                                                                      style: TextStyle(
+                                                                          fontFamily:
+                                                                              'Helvetica',
+                                                                          fontWeight: FontWeight
+                                                                              .w400,
+                                                                          color: Colors
+                                                                              .white,
+                                                                          fontSize:
+                                                                              16),
+                                                                    ),
+                                                            ),
+                                                          ),
+                                                        ]),
+                                                  ]),
+                                            ))
                                 ]))
                       ])
                     ]),
@@ -446,163 +552,244 @@ class _EditProfileState extends State<EditProfile> {
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(20),
                                         color: Colors.white),
-                                    child: Form(
-                                      key: editKey,
-                                      child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            //  imageProfile(context, state),
-                                            SizedBox(
-                                              height: Globals.getDeviceHeight(
-                                                      context) *
-                                                  0.05,
-                                            ),
-                                            editRowtext(
-                                                context,
-                                                "Name:",
-                                                Globals.isTextNullOrEmptyString(
-                                                    authCub.state.fullname),
-                                                (value) => value.isNotEmpty &&
-                                                        value != "" &&
-                                                        value.trim().length <=
-                                                            30
-                                                    ? context
-                                                        .read<AuthCubit>()
-                                                        .fullName(value)
-                                                    : print("$value")
-                                                // "Marcel"
-                                                , (value) {
-                                              if (value == null ||
-                                                  value.trim().isEmpty) {
-                                                return 'Name is required';
-                                              }
-                                              if (value.trim().length > 30) {
-                                                return 'Dont Exceed the text Limit';
-                                              }
-                                              return null;
-                                            }),
-                                            editRowtext(
-                                                context,
-                                                "Username:",
-                                                Globals.isTextNullOrEmptyString(
-                                                    authCub.state.username ??
-                                                        ""),
-                                                (value) => value.isNotEmpty &&
-                                                        value != "" &&
-                                                        value.trim().length <=
-                                                            25
-                                                    ? context
-                                                        .read<AuthCubit>()
-                                                        .username(value)
-                                                    : print("$value")
-                                                //"John Deo"
-                                                , (value) {
-                                              if (value == null ||
-                                                  value.trim().isEmpty) {
-                                                return 'UserName is required';
-                                              }
-                                              if (value.trim().length > 25) {
-                                                return 'Dont Exceed the text Limit';
-                                              }
-                                              return null;
-                                            }),
-                                            editRowtext(
-                                                context,
-                                                "Email:",
-                                                Globals.isTextNullOrEmptyString(
-                                                    authCub.state.email),
-                                                (value) => value.isNotEmpty &&
-                                                        value != "" &&
-                                                        value.trim().length <=
-                                                            30
-                                                    ? context
-                                                        .read<AuthCubit>()
-                                                        .email(value)
-                                                    : print("$value")
-                                                // "marcel23@gmail.com"
-                                                , (value) {
-                                              if (value == null ||
-                                                  value.trim().isEmpty) {
-                                                return 'Email is required';
-                                              }
-                                              if (value.trim().length > 30) {
-                                                return 'Dont Exceed the text Limit';
-                                              }
-                                              return null;
-                                            }),
-                                            editRowtext(
-                                                context,
-                                                "Password:",
-                                                "",
-                                                (value) => value.isNotEmpty &&
-                                                        value != "" &&
-                                                        value.trim().length <= 8
-                                                    ? context
-                                                        .read<AuthCubit>()
-                                                        .password(value)
-                                                    : print("$value"), (value) {
-                                              if (value == null ||
-                                                  value.trim().isEmpty) {
-                                                return 'Password is required';
-                                              }
-                                              if (value.trim().length > 30) {
-                                                return 'Dont Exceed the text Limit';
-                                              }
-                                              return null;
-                                            }),
+                                    child: (isloading == false)
+                                        ? Center(
+                                            child: CircularProgressIndicator(),
+                                          )
+                                        : Form(
+                                            key: editKey,
+                                            child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                children: [
+                                                  //  imageProfile(context, state),
+                                                  SizedBox(
+                                                    height:
+                                                        Globals.getDeviceHeight(
+                                                                context) *
+                                                            0.05,
+                                                  ),
+                                                  editRowtext(
+                                                      context,
+                                                      "Name:",
+                                                      Globals
+                                                          .isTextNullOrEmptyString(
+                                                              authCub.state
+                                                                  .fullname),
+                                                      (value) => value
+                                                                  .isNotEmpty &&
+                                                              value != "" &&
+                                                              value
+                                                                      .trim()
+                                                                      .length <=
+                                                                  30
+                                                          ? context
+                                                              .read<AuthCubit>()
+                                                              .fullName(value)
+                                                          : print("$value")
+                                                      // "Marcel"
+                                                      , (value) {
+                                                    if (value == null ||
+                                                        value.trim().isEmpty) {
+                                                      return 'Name is required';
+                                                    }
+                                                    if (value.trim().length >
+                                                        30) {
+                                                      return 'Dont Exceed the text Limit';
+                                                    }
+                                                    return null;
+                                                  }),
+                                                  editRowtext(
+                                                      context,
+                                                      "Username:",
+                                                      Globals
+                                                          .isTextNullOrEmptyString(
+                                                              authCub.state
+                                                                      .username ??
+                                                                  ""),
+                                                      (value) => value
+                                                                  .isNotEmpty &&
+                                                              value != "" &&
+                                                              value
+                                                                      .trim()
+                                                                      .length <=
+                                                                  25
+                                                          ? context
+                                                              .read<AuthCubit>()
+                                                              .username(value)
+                                                          : print("$value")
+                                                      //"John Deo"
+                                                      , (value) {
+                                                    if (value == null ||
+                                                        value.trim().isEmpty) {
+                                                      return 'UserName is required';
+                                                    }
+                                                    if (value.trim().length >
+                                                        25) {
+                                                      return 'Dont Exceed the text Limit';
+                                                    }
+                                                    return null;
+                                                  }),
+                                                  editRowtext(
+                                                      context,
+                                                      "Email:",
+                                                      Globals
+                                                          .isTextNullOrEmptyString(
+                                                              authCub
+                                                                  .state.email),
+                                                      (value) => value
+                                                                  .isNotEmpty &&
+                                                              value != "" &&
+                                                              value
+                                                                      .trim()
+                                                                      .length <=
+                                                                  30
+                                                          ? context
+                                                              .read<AuthCubit>()
+                                                              .email(value)
+                                                          : print("$value")
+                                                      // "marcel23@gmail.com"
+                                                      , (value) {
+                                                    if (value == null ||
+                                                        value.trim().isEmpty) {
+                                                      return 'Email is required';
+                                                    }
+                                                    if (value.trim().length >
+                                                        30) {
+                                                      return 'Dont Exceed the text Limit';
+                                                    }
+                                                    return null;
+                                                  }),
+                                                  Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.end,
+                                                    children: [
+                                                      Row(
+                                                        children: [
+                                                          SizedBox(
+                                                            width: Globals
+                                                                    .getDeviceWidth(
+                                                                        context) *
+                                                                0.3,
+                                                            child: Text(
+                                                                "Password: ",
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontFamily:
+                                                                      'Helvetica',
+                                                                  color: Color(
+                                                                      0xff676767),
+                                                                  fontSize: 16,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w400,
+                                                                )),
+                                                          ),
+                                                          SizedBox(
+                                                            width: Globals
+                                                                    .getDeviceWidth(
+                                                                        context) *
+                                                                0.45,
+                                                            child: TextFormField(
+                                                                textAlignVertical: TextAlignVertical.top,
+                                                                decoration: InputDecoration(
+                                                                    //  contentPadding: EdgeInsets.only(bottom: 0),
+                                                                    isDense: true,
+                                                                    alignLabelWithHint: true),
+                                                                onChanged: (value) {
+                                                                  context
+                                                                      .read<
+                                                                          AuthCubit>()
+                                                                      .password(
+                                                                          value);
+                                                                },
+                                                                style: TextStyle(
+                                                                  fontFamily:
+                                                                      'Helvetica',
+                                                                  color: Globals
+                                                                      .kUniversalColor,
+                                                                  fontSize: 16,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w400,
+                                                                )),
+                                                          )
+                                                        ],
+                                                      ),
+                                                      SizedBox(
+                                                        height: Globals
+                                                                .getDeviceHeight(
+                                                                    context) *
+                                                            0.03,
+                                                      )
+                                                    ],
+                                                  ),
 
-                                            SizedBox(
-                                              height: Globals.getDeviceHeight(
-                                                      context) *
-                                                  0.03,
-                                            ),
-                                            DecoratedBox(
-                                              decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  gradient: LinearGradient(
-                                                      colors: [
-                                                        Color(0xff233C7E),
-                                                        Color(0xff456BD0)
-                                                      ])),
-                                              child: MaterialButton(
-                                                height: 50,
-                                                shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10)),
-                                                minWidth: double.infinity,
-                                                onPressed: () async {
-                                                  if (editKey.currentState!
-                                                      .validate()) {
-                                                    await context
-                                                        .read<AuthCubit>()
-                                                        .editProfile(context,
-                                                            authCub.getuserID);
-                                                    Navigator.pop(context);
-                                                    context
-                                                        .read<AuthCubit>()
-                                                        .getUser(
-                                                            context,
-                                                            widget.userModel
-                                                                    ?.id ??
-                                                                0);
-                                                  }
-                                                },
-                                                child: Text(
-                                                  "Update",
-                                                  style: TextStyle(
-                                                      fontFamily: 'Helvetica',
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                      color: Colors.white,
-                                                      fontSize: 16),
-                                                ),
-                                              ),
-                                            ),
-                                          ]),
-                                    ),
+                                                  SizedBox(
+                                                    height:
+                                                        Globals.getDeviceHeight(
+                                                                context) *
+                                                            0.03,
+                                                  ),
+                                                  DecoratedBox(
+                                                    decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                        gradient:
+                                                            LinearGradient(
+                                                                colors: [
+                                                              Color(0xff233C7E),
+                                                              Color(0xff456BD0)
+                                                            ])),
+                                                    child: MaterialButton(
+                                                      height: 50,
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10)),
+                                                      minWidth: double.infinity,
+                                                      onPressed: () async {
+                                                        if (editKey
+                                                            .currentState!
+                                                            .validate()) {
+                                                          await context
+                                                              .read<AuthCubit>()
+                                                              .editProfile(
+                                                                  context,
+                                                                  authCub
+                                                                      .getuserID);
+                                                          Navigator.pop(
+                                                              context);
+                                                          context
+                                                              .read<AuthCubit>()
+                                                              .getProfile(
+                                                                  context,
+                                                                  authCub
+                                                                      .getuserID);
+                                                        }
+                                                      },
+                                                      child: (state.isloading ??
+                                                              false)
+                                                          ? CircularProgressIndicator()
+                                                          : Text(
+                                                              "Update",
+                                                              style: TextStyle(
+                                                                  fontFamily:
+                                                                      'Helvetica',
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w400,
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontSize: 16),
+                                                            ),
+                                                    ),
+                                                  ),
+                                                ]),
+                                          ),
                                   )
                                 ]))
                       ])
@@ -718,47 +905,5 @@ class _EditProfileState extends State<EditProfile> {
         )
       ],
     );
-  }
-
-  void takephoto(BuildContext context, ImageSource imageSource) async {
-    final xFile = await _picker.pickImage(source: imageSource);
-    context.read<AuthCubit>().image(xFile!);
-  }
-
-  Widget imageProfile(BuildContext context, AuthState state) {
-    return Stack(children: [
-      CircleAvatar(
-        backgroundColor: Globals.kUniversalColor,
-        radius: 50,
-        backgroundImage:
-            //  image == null ? Container() : Image.file(File(image!.path))
-            state.imagefile == null
-                ? AssetImage('assets/user.png') as ImageProvider
-                : FileImage(
-                    File(context.read<AuthCubit>().state.imagefile.path)),
-      ),
-      Positioned(
-          bottom: 0,
-          right: 0,
-          child: InkWell(
-            onTap: () {
-              takephoto(context, ImageSource.gallery);
-            },
-            child: Container(
-                padding: const EdgeInsetsDirectional.symmetric(horizontal: 5),
-                height: 25,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: <Color>[Color(0xff233C7E), Color(0xff456BD0)]),
-                    shape: BoxShape.circle),
-                child: Icon(
-                  Icons.add,
-                  color: Colors.white,
-                )),
-          ))
-    ]);
   }
 }

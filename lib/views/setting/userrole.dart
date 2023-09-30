@@ -23,11 +23,15 @@ class _UserRoleState extends State<UserRole> {
   bool btncheck = false;
   int index = 0;
   var ichceeckd = true;
+  bool isloading = false;
   AuthCubit? authCub;
 
   @override
   void initState() {
     authCub = BlocProvider.of<AuthCubit>(context, listen: false);
+    setState(() {
+      isloading = true;
+    });
     super.initState();
   }
 
@@ -257,161 +261,157 @@ class _UserRoleState extends State<UserRole> {
                       ),
                     ),
                   ),
-                  ListView.separated(
-                      separatorBuilder: (context, index) => Divider(
-                            color: Colors.transparent,
-                            height: 10,
-                          ),
-                      itemCount: state.userList?.length ?? 0,
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      padding: EdgeInsets.only(top: 20, bottom: 20),
-                      itemBuilder: (context, index) => InkWell(
-                            onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => Profile(
-                                        userModel: state.userList?[index],
-                                        i: index,
-                                        btncheck: "GetUser"))),
-                            // Navigator.pushNamed(context, rolesManagement),
-                            child: Container(
-                              height: 45,
-                              margin: EdgeInsets.only(left: 10, right: 10),
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(30)),
-                              child: Row(
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.only(
-                                      left: 25,
-                                    ),
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        SizedBox(
-                                          width: isLandscape(context)
-                                              ? Globals.getDeviceWidth(
-                                                      context) *
-                                                  0.25
-                                              : Globals.getDeviceWidth(
-                                                      context) *
-                                                  0.22,
-                                          child: Text(
-                                            state.userList![index].username
-                                                .toString(),
-                                            //  "User A",
-                                            style: TextStyle(
-                                                fontFamily: 'Helvetica',
-                                                fontWeight: FontWeight.w400,
-                                                color: Color(0xff787878),
-                                                fontSize: 14),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: isLandscape(context)
-                                              ? Globals.getDeviceWidth(
-                                                      context) *
-                                                  0.22
-                                              : Globals.getDeviceWidth(
-                                                      context) *
-                                                  0.2,
-                                          child: Text(
-                                            state.userList![index].roleName
-                                                .toString(),
-                                            // "Admin",
-                                            style: TextStyle(
-                                                fontFamily: 'Helvetica',
-                                                fontWeight: FontWeight.w400,
-                                                color: Color(0xff787878),
-                                                fontSize: 14),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: isLandscape(context)
-                                              ? Globals.getDeviceWidth(
-                                                      context) *
-                                                  0.16
-                                              : Globals.getDeviceWidth(
-                                                      context) *
-                                                  0.2,
-                                          child: Text(
-                                            //"$convertdate",
-                                            state.userList![index].createdAt
-                                                .toString(),
-                                            style: TextStyle(
-                                                fontFamily: 'Helvetica',
-                                                fontWeight: FontWeight.w400,
-                                                color: Color(0xff787878),
-                                                fontSize: 14),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  // StyledSwitch(
-                                  //   onToggled: (bool isToggled) {
-                                  //     final int userId =
-                                  //         state.userList?[index].id ?? 0;
-                                  //     final int isPending =
-                                  //         state.userList?[index].isPending ?? 0;
-
-                                  //     // Toggle the boolean flag
-                                  //     isPending == 0 ? false : true;
-
-                                  //     // Change the switch color based on the flag
-                                  //     setState(() {
-                                  //       isToggled =
-                                  //           isPending == 0 ? true : false;
-                                  //     });
-
-                                  //     // Call the userFlag function if the flag is true
-                                  //     if (isPending == 1) {
-                                  //       context
-                                  //           .read<AuthCubit>()
-                                  //           .userFlag(userId);
-                                  //     }
-
-                                  //     // Rest of your code for handling the switch
-                                  //     print(userId);
-                                  //     print(state.userList?[index].isPending);
-                                  //   },
-                                  // )
-                                  if (hasWriteUser)
-                                    Switch(
-                                      onChanged: (value) {
-                                        bool isPending = !value;
-                                        BlocProvider.of<AuthCubit>(context)
-                                            .isPending(isPending ? 0 : 1);
-                                        BlocProvider.of<AuthCubit>(context)
-                                            .updateIsPending(isPending ? 0 : 1);
-                                        BlocProvider.of<AuthCubit>(context)
-                                            .userFlag(
-                                                state.userList?[index].id ?? 0,
-                                                isPending ? 0 : 1);
-                                        print(
-                                            BlocProvider.of<AuthCubit>(context)
-                                                .state
-                                                .updateisPending);
-                                      },
-                                      value:
-                                          state.userList?[index].isPending == 0,
-                                      activeColor:
-                                          state.userList?[index].isPending == 0
-                                              ? Colors.blue
-                                              : Colors.white,
-                                      activeTrackColor: Color(0xffC1C1C1),
-                                      inactiveThumbColor: Colors.white,
-                                      inactiveTrackColor: Color(0xffC1C1C1),
-                                    )
-                                ],
+                  (isloading == false)
+                      ? Center(
+                          child: CircularProgressIndicator(),
+                        )
+                      : ListView.separated(
+                          separatorBuilder: (context, index) => Divider(
+                                color: Colors.transparent,
+                                height: 10,
                               ),
-                            ),
-                          )),
+                          itemCount: state.userList?.length ?? 0,
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          padding: EdgeInsets.only(top: 20, bottom: 20),
+                          itemBuilder: (context, index) => InkWell(
+                                onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) => Profile(
+                                            userModel: state.userList?[index],
+                                            i: index,
+                                            btncheck: "GetUser"))),
+                                // Navigator.pushNamed(context, rolesManagement),
+                                child: Container(
+                                  height: 45,
+                                  margin: EdgeInsets.only(left: 10, right: 10),
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(30)),
+                                  child: Row(
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                          left: 25,
+                                        ),
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            SizedBox(
+                                              width: isLandscape(context)
+                                                  ? Globals.getDeviceWidth(
+                                                          context) *
+                                                      0.25
+                                                  : Globals.getDeviceWidth(
+                                                          context) *
+                                                      0.22,
+                                              child: Text(
+                                                state.userList![index].username
+                                                    .toString(),
+                                                //  "User A",
+                                                style: TextStyle(
+                                                    fontFamily: 'Helvetica',
+                                                    fontWeight: FontWeight.w400,
+                                                    color: Color(0xff787878),
+                                                    fontSize: 14),
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: isLandscape(context)
+                                                  ? Globals.getDeviceWidth(
+                                                          context) *
+                                                      0.22
+                                                  : Globals.getDeviceWidth(
+                                                          context) *
+                                                      0.2,
+                                              child: Text(
+                                                state.userList![index].roleName
+                                                    .toString(),
+                                                // "Admin",
+                                                style: TextStyle(
+                                                    fontFamily: 'Helvetica',
+                                                    fontWeight: FontWeight.w400,
+                                                    color: Color(0xff787878),
+                                                    fontSize: 14),
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: isLandscape(context)
+                                                  ? Globals.getDeviceWidth(
+                                                          context) *
+                                                      0.16
+                                                  : Globals.getDeviceWidth(
+                                                          context) *
+                                                      0.2,
+                                              child: Text(
+                                                //"$convertdate",
+                                                state.userList![index].createdAt
+                                                    .toString(),
+                                                style: TextStyle(
+                                                    fontFamily: 'Helvetica',
+                                                    fontWeight: FontWeight.w400,
+                                                    color: Color(0xff787878),
+                                                    fontSize: 14),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      // StyledSwitch(
+                                      //   onToggled: (bool isToggled) {
+                                      //     final int userId =
+                                      //         state.userList?[index].id ?? 0;
+                                      //     final int isPending =
+                                      //         state.userList?[index].isPending ?? 0;
+
+                                      //     // Toggle the boolean flag
+                                      //     isPending == 0 ? false : true;
+
+                                      //     // Change the switch color based on the flag
+                                      //     setState(() {
+                                      //       isToggled =
+                                      //           isPending == 0 ? true : false;
+                                      //     });
+
+                                      //     // Call the userFlag function if the flag is true
+                                      //     if (isPending == 1) {
+                                      //       context
+                                      //           .read<AuthCubit>()
+                                      //           .userFlag(userId);
+                                      //     }
+
+                                      //     // Rest of your code for handling the switch
+                                      //     print(userId);
+                                      //     print(state.userList?[index].isPending);
+                                      //   },
+                                      // )
+
+                                      Switch(
+                                        onChanged: (value) {
+                                          BlocProvider.of<AuthCubit>(context)
+                                              .userFlag(state.userList, index,
+                                                  context);
+                                        },
+                                        value:
+                                            state.userList?[index].isPending ==
+                                                0,
+                                        activeColor:
+                                            state.userList?[index].isPending ==
+                                                    0
+                                                ? Colors.blue
+                                                : Colors.white,
+                                        activeTrackColor: Color(0xffC1C1C1),
+                                        inactiveThumbColor: Colors.white,
+                                        inactiveTrackColor: Color(0xffC1C1C1),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              )),
                 ],
               ),
             );

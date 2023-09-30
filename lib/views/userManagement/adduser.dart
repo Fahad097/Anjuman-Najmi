@@ -276,14 +276,17 @@ class _AddUserState extends State<AddUser> {
                                               Navigator.pop(context);
                                             }
                                           },
-                                          child: Text(
-                                            "Add User",
-                                            style: TextStyle(
-                                                fontFamily: 'Helvetica',
-                                                fontWeight: FontWeight.w400,
-                                                color: Colors.white,
-                                                fontSize: 16),
-                                          ),
+                                          child: (state.isloading ?? false)
+                                              ? CircularProgressIndicator()
+                                              : Text(
+                                                  "Add User",
+                                                  style: TextStyle(
+                                                      fontFamily: 'Helvetica',
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                      color: Colors.white,
+                                                      fontSize: 16),
+                                                ),
                                         ),
                                       ),
                                     ]),

@@ -39,6 +39,13 @@ class ReceiptProvider {
     );
   }
 
+  Future getPDF(int id) async {
+    debugPrint("pdf id ${ApiUrls.getReceiptPDF + id.toString()}");
+    return await ServiceHelper.getApiCall(
+      ApiUrls.getReceiptPDF + id.toString(),
+    );
+  }
+
   Future deleteReceipt(int id) async {
     debugPrint("ReceiptNumber ${ApiUrls.getreceiptid + id.toString()}");
     return await ServiceHelper.deleteApiCall(

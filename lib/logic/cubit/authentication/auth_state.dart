@@ -3,7 +3,7 @@ part of 'auth_cubit.dart';
 class AuthState {
   final String? roleName;
   final String? email;
-  final String? password;
+  String? password;
   final int? roleId;
   final String? username;
   int? isPending;
@@ -17,21 +17,26 @@ class AuthState {
   final bool? activeConnection;
   GlobalKey<FormState>? loginkey;
   final imagefile;
-  final Map<String,dynamic>? permission;
+  final Map<String, dynamic>? permission;
   final String? fullname;
   final String? error;
   List<AccessModel>? accesses;
 
   final String? updateusername;
   final String? updatefullname;
-  final String? updatepassword;
+  String? updatepassword;
   final String? updatemail;
   final int? updateroleId;
   final int? updateisPending;
-
+  final String? profileState;
+  final String? editprofileState;
+  final String? getprofileState;
   AuthState(
       {this.phoneNum,
       this.updateisPending,
+      this.profileState,
+      this.editprofileState,
+      this.getprofileState,
       this.permission,
       this.userList,
       this.token,
@@ -61,13 +66,13 @@ class AuthState {
     final int? uupdateisPending,
     final String? uusername,
     final String? ffullname,
-    final String? ppassword,
+    String? ppassword,
     final String? rroleName,
     final int? rroleId,
     final int? iisPending,
     final String? phoneNu,
     final String? ttoken,
-    final Map<String,dynamic>? ppermission,
+    final Map<String, dynamic>? ppermission,
     final List<UserModel>? uuserList,
     bool? iisloading,
     final String? eemail,
@@ -78,35 +83,40 @@ class AuthState {
     String? phoneNum,
     List<AccessModel>? accesses_,
     final String? uupdateusername,
-    final String? uupdatefullname,
+    String? uupdatefullname,
     final String? uupdatepassword,
     final String? uupdatemail,
     final int? uupdateroleId,
+    final String? pprofileState,
+    final String? eeditprofileState,
+    final String? ggetprofileState,
   }) {
     return AuthState(
-      phoneNum: phoneNu ?? phoneNum,
-      updateisPending: uupdateisPending ?? updateisPending,
-      roleName: rroleName ?? roleName,
-      roleId: rroleId ?? roleId,
-      isPending: iisPending ?? isPending,
-      error: eerror ?? error,
-      token: ttoken ?? token,
-      permission: ppermission ?? permission,
-      password: ppassword ?? password,
-      email: eemail ?? email,
-      userList: uuserList ?? userList,
-      isloading: iisloading ?? isloading,
-      username: uusername ?? username,
-      fullname: ffullname ?? fullname,
-      loginkey: lloginkeyy ?? loginkey,
-      userId: uuserid ?? userId,
-      imagefile: iimagefile ?? imagefile,
-      accesses: accesses_ ?? accesses,
-      updateusername: uupdateusername ?? updateusername,
-      updatefullname: uupdatefullname ?? updatefullname,
-      updatepassword: uupdatepassword ?? updatepassword,
-      updatemail: uupdatemail ?? updatemail,
-      updateroleId: uupdateroleId ?? updateroleId,
-    );
+        phoneNum: phoneNu ?? phoneNum,
+        updateisPending: uupdateisPending ?? updateisPending,
+        roleName: rroleName ?? roleName,
+        roleId: rroleId ?? roleId,
+        isPending: iisPending ?? isPending,
+        error: eerror ?? error,
+        token: ttoken ?? token,
+        permission: ppermission ?? permission,
+        password: ppassword ?? password,
+        email: eemail ?? email,
+        userList: uuserList ?? userList,
+        isloading: iisloading ?? isloading,
+        username: uusername ?? username,
+        fullname: ffullname ?? fullname,
+        loginkey: lloginkeyy ?? loginkey,
+        userId: uuserid ?? userId,
+        imagefile: iimagefile ?? imagefile,
+        accesses: accesses_ ?? accesses,
+        updateusername: uupdateusername ?? updateusername,
+        updatefullname: uupdatefullname ?? updatefullname,
+        updatepassword: uupdatepassword ?? updatepassword,
+        updatemail: uupdatemail ?? updatemail,
+        updateroleId: uupdateroleId ?? updateroleId,
+        editprofileState: eeditprofileState ?? editprofileState,
+        profileState: pprofileState ?? profileState,
+        getprofileState: ggetprofileState ?? getprofileState);
   }
 }

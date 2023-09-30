@@ -120,39 +120,39 @@ class _AccessOptionState extends State<AccessOption> {
                   color: Color(0xff5C5C5C),
                   fontSize: 14)),
         ),
-        SizedBox(
-          width: Globals.getDeviceWidth(context) * 0.42,
-          height: 30,
-          child: BlocBuilder<AccessCubit, AccessState>(
-            builder: (context, state) {
-              return DropdownButtonHideUnderline(
-                child: DropdownButton(
-                    hint: Text("Select"),
-                    icon: ImageIcon(
-                      AssetImage(AssetConfig.kdropdownIcon),
-                      color: Color(0xff86A3F0),
-                      size: 12,
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                    value: _selectedValue,
-                    style: TextStyle(
-                      fontFamily: 'Helvetica',
-                      color: Color(0xff6D6D6D),
-                      fontSize: 10,
-                      fontWeight: FontWeight.w400,
-                    ),
-                    onChanged: (newValue) {
-                      BlocProvider.of<AccessCubit>(context).updateAccess(
-                          parentIndex, childIndex: index, newValue!);
-                      setState(() {
-                        _selectedValue = accessList[index].access!;
-                      });
-                    },
-                    items: dropdownItems),
-              );
-            },
-          ),
-        ),
+        // SizedBox(
+        //   width: Globals.getDeviceWidth(context) * 0.42,
+        //   height: 30,
+        //   child: BlocBuilder<AccessCubit, AccessState>(
+        //     builder: (context, state) {
+        //       return DropdownButtonHideUnderline(
+        //         child: DropdownButton(
+        //             hint: Text("Select"),
+        //             icon: ImageIcon(
+        //               AssetImage(AssetConfig.kdropdownIcon),
+        //               color: Color(0xff86A3F0),
+        //               size: 12,
+        //             ),
+        //             borderRadius: BorderRadius.circular(20),
+        //             value: _selectedValue,
+        //             style: TextStyle(
+        //               fontFamily: 'Helvetica',
+        //               color: Color(0xff6D6D6D),
+        //               fontSize: 10,
+        //               fontWeight: FontWeight.w400,
+        //             ),
+        //             onChanged: (newValue) {
+        //               BlocProvider.of<AccessCubit>(context).updateAccess(
+        //                   parentIndex, childIndex: index, newValue!);
+        //               setState(() {
+        //                 _selectedValue = accessList[index].access!;
+        //               });
+        //             },
+        //             items: dropdownItems),
+        //       );
+        //     },
+        //   ),
+        // ),
         SizedBox(
           width: Globals.getDeviceWidth(context) * 0.01,
         )

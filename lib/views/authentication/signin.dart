@@ -3,7 +3,6 @@ import 'package:anjuman_e_najmi/routes/routes_names.dart';
 import 'package:anjuman_e_najmi/utils/global_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../logic/cubit/receipt/receipt_cubit.dart';
 import '../../utils/asset_config.dart';
 import '../../utils/landscape_mode.dart';
 import 'components/asset_provider.dart';
@@ -53,7 +52,7 @@ class SignIn extends StatelessWidget {
                             width: Globals.getDeviceWidth(context),
                             height: isLandscape(context)
                                 ? Globals.getDeviceHeight(context) * 0.8
-                                : Globals.getDeviceHeight(context) * 0.66,
+                                : Globals.getDeviceHeight(context) * 0.6,
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(25),
                                 color: Colors.white),
@@ -120,8 +119,6 @@ class SignIn extends StatelessWidget {
                                           0.025,
                                     ),
                                     TextFormField(
-                                      autovalidateMode:
-                                          AutovalidateMode.onUserInteraction,
                                       keyboardType: TextInputType.number,
                                       obscureText: true,
                                       validator: (value) {
@@ -135,13 +132,20 @@ class SignIn extends StatelessWidget {
                                         // Return null if the entered password is valid
                                         return null;
                                       },
-                                      onChanged: (value) => value.isNotEmpty &&
-                                              value != '' &&
-                                              value.trim().length <= 8
-                                          ? context
+                                      onChanged: (value) {
+                                        final authCub =
+                                            BlocProvider.of<AuthCubit>(context,
+                                                listen: false);
+                                        if (value.isNotEmpty &&
+                                            value != '' &&
+                                            value.trim().length <= 8) {
+                                          context
                                               .read<AuthCubit>()
-                                              .password(value)
-                                          : print("$value"),
+                                              .password(value);
+                                        } else {
+                                          print("$value");
+                                        }
+                                      },
                                       decoration: InputDecoration(
                                         // focusColor: const Color(0xffE4F9E8),
 
@@ -173,38 +177,30 @@ class SignIn extends StatelessWidget {
                                             Color(0xff456BD0)
                                           ])),
                                       child: MaterialButton(
-                                        height: 50,
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10)),
-                                        minWidth: double.infinity,
-                                        // color: Globals.kUniversalColor,
-                                        onPressed: () {
-                                          // showDialog(
-                                          //     context: context,
-                                          //     builder: (BuildContext context) =>
-                                          // VerificationDialog());
-                                          // BlocProvider.of<AuthCubit>(context)
-                                          //     .startTimer();
-                                          if (formKey.currentState!
-                                              .validate()) {
-                                            context
-                                                .read<AuthCubit>()
-                                                .signin(context);
-                                            //  context.read<AuthCubit>().sigin();
-                                            // context.read<AuthCubit>().createAlbum(
-                                            //     state.name!, state.password!);
-                                          }
-                                        },
-                                        child: Text(
-                                          "Sign In",
-                                          style: TextStyle(
-                                              fontFamily: 'Helvetica',
-                                              fontWeight: FontWeight.w400,
-                                              color: Colors.white,
-                                              fontSize: 16),
-                                        ),
-                                      ),
+                                          height: 50,
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10)),
+                                          minWidth: double.infinity,
+                                          onPressed: () {
+                                            if (formKey.currentState!
+                                                .validate()) {
+                                              context
+                                                  .read<AuthCubit>()
+                                                  .signin(context);
+                                            }
+                                          },
+                                          child: (state.isloading!)
+                                              ? CircularProgressIndicator()
+                                              : Text(
+                                                  "Sign In",
+                                                  style: TextStyle(
+                                                      fontFamily: 'Helvetica',
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                      color: Colors.white,
+                                                      fontSize: 16),
+                                                )),
                                     ),
                                     // BlocBuilder<ReceiptCubit, ReceiptState>(
                                     //     builder: (context, state) {

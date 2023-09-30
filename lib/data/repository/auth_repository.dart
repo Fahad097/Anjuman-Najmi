@@ -42,8 +42,8 @@ class AuthRepository {
     return result;
   }
 
-  Future editProfile(Map<String, dynamic> variable, int id) async {
-    final result = await provider.editProfile(variable, id);
+  Future editProfile(Map<String, dynamic> variable, int id) {
+    final result = provider.editProfile(variable, id);
     debugPrint("editProfile Repository ${result.toString()}");
     return result;
   }

@@ -175,42 +175,36 @@ class _BudgetState extends State<Budget> with TickerProviderStateMixin {
                                 prefixIconColor: Colors.grey,
                               )),
                         ),
-                        state.accesses?[1].access == 'r' ||
-                                state.accesses?[1].access == 'w'
-                            ? TabBar(
-                                labelStyle: TextStyle(
-                                    fontFamily: 'Helvetica',
-                                    fontWeight: FontWeight.w400,
-                                    color: Colors.white,
-                                    fontSize: 16),
-                                indicatorSize: TabBarIndicatorSize.label,
-                                indicatorColor: Colors.white,
-                                controller: _tabController,
-                                labelColor: Colors.white,
-                                unselectedLabelColor: Colors.white,
-                                indicator: UnderlineTabIndicator(
-                                  borderSide:
-                                      BorderSide(width: 2, color: Colors.white),
-                                  //hight of indicator
-                                  insets: EdgeInsets.symmetric(
-                                      horizontal: 4.0, vertical: 11),
-                                ),
-                                onTap: (i) {},
-                                tabs: [
-                                  // first tab [you can add an icon using the icon property]
-                                  if (state.accesses?[1].access == 'w')
-                                    Tab(
-                                      text: 'Create',
-                                    ),
+                        TabBar(
+                          labelStyle: TextStyle(
+                              fontFamily: 'Helvetica',
+                              fontWeight: FontWeight.w400,
+                              color: Colors.white,
+                              fontSize: 16),
+                          indicatorSize: TabBarIndicatorSize.label,
+                          indicatorColor: Colors.white,
+                          controller: _tabController,
+                          labelColor: Colors.white,
+                          unselectedLabelColor: Colors.white,
+                          indicator: UnderlineTabIndicator(
+                            borderSide:
+                                BorderSide(width: 2, color: Colors.white),
+                            //hight of indicator
+                            insets: EdgeInsets.symmetric(
+                                horizontal: 4.0, vertical: 11),
+                          ),
+                          onTap: (i) {},
+                          tabs: [
+                            // first tab [you can add an icon using the icon property]
+                            Tab(
+                              text: 'Create',
+                            ),
 
-                                  Tab(
-                                    text: 'View',
-                                  ),
-                                ],
-                              )
-                            : SizedBox(
-                                height: 10,
-                              )
+                            Tab(
+                              text: 'View',
+                            ),
+                          ],
+                        )
                       ],
                     );
                   },
@@ -222,10 +216,7 @@ class _BudgetState extends State<Budget> with TickerProviderStateMixin {
         builder: (context, state) {
           return TabBarView(
             controller: _tabController,
-            children: [
-              if (state.accesses?[1].access == 'w') CreateBudget(),
-              Icon(Icons.bike_scooter)
-            ],
+            children: [CreateBudget(), Icon(Icons.bike_scooter)],
           );
         },
       ),

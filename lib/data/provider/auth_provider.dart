@@ -93,9 +93,9 @@ class AuthProvider {
     return await ServiceHelper.getApiCall(ApiUrls.getAlluser);
   }
 
-  Future editProfile(Map<String, dynamic> variable, int id) async {
+  Future editProfile(Map<String, dynamic> variable, int id) {
     debugPrint(ApiUrls.editprofile + id.toString());
-    return await ServiceHelper.putApiCall(
+    return ServiceHelper.putApiCall(
         ApiUrls.editprofile + id.toString(), variable);
   }
 
